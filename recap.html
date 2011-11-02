@@ -6,12 +6,15 @@
 	<span class='vb_badge vb_recap_scripts'><span id='vb_scripts_count'></span></span>
 </div>
 
-<div id='vb_list'>
-</div>
+<div id='vb_list'></div>
 
+<div id='vb_search_popup'>
+	<ul id='vb_search_list'></ul>
+</div>
 
 <script type="text/javascript">
 	$('#vb_recap').click(function(){
 		$('#vb_list').toggle();
+		$('#vb_search_popup').hide();
 	});
 </script>

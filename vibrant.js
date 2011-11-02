@@ -21,9 +21,12 @@ var Vibrant = Vibrant || {};
 	Called before Vibrant.load; inserts HTML template into current window.
 */
 
+Vibrant.CHROME_EXT_ID = 'ajbmfkelgmajcpnhoaiadgnhmeocbidi';
+
 Vibrant.waiting = function() {
 	$('body').prepend("<div id='vibrant_main'></div");
-	$("#vibrant_main").load('chrome-extension://ajbmfkelgmajcpnhoaiadgnhmeocbidi/recap.html',function(){
+	//$("#vibrant_main").load('chrome-extension://'+Vibrant.CHROME_EXT_ID+'/recap.html',function(){
+	$("#vibrant_main").load(chrome.extension.getURL('recap.html'),function(){
 		Vibrant.vibrateColors();
 	});
 }
@@ -69,10 +72,41 @@ Vibrant.displayLinks = function(_http_links) {
 		$("#vb_list").append("<h3 id='"+i+"Header"+"'>"+i+"</h3>");
 		var links_list = '';
 		$.each(_http_links[i],function(j){
-			links_list += "<li>"+_http_links[i][j]+"</li>";		
+			links_list += "<li class='vb_link'>"+_http_links[i][j]+"</li>";		
 		});
 		$("#"+i+"Header").after("<ol>"+links_list+"</ol>");
 	});
+	Vibrant.setSearchDomainName();
+}
+
+Vibrant.setSearchDomainName = function() {	
+	$('.vb_link').each(function(){
+		var domain = parseBaseDomainFromLink($(this).text());
+		var query = "http://ajax.googleapis.com/ajax/services/search/web?start=0&rsz=large&v=1.0&q="
+		var items = "";
+		$.getJSON(query+domain,function(data){
+			$.each(data["responseData"]["results"], function(key, val) {
+				var url = val["url"];
+				var title = val["title"];
+				var blurb = val["titleNoFormatting"];
+				items += "<li><a target='_blank' href='"+url+"'>"+title+"'</a></li>";
+			});		
+	  	});
+		$(this).mouseover(function(){
+			$("#vb_search_list").empty();
+			$("#vb_search_list").append(items);
+			var top = $(this).offset().top;
+			var left = $(this).offset().left;
+			$("#vb_search_popup").offset({top:top,left:left-230});
+			$("#vb_search_popup").show();
+		});
+		
+		$(this).mouseout(function(){
+			//$("#vb_search_list").empty();
+			//$("#vb_search_popup").hide();
+		});
+		
+	});	
 }
 
 /* 
@@ -123,7 +157,8 @@ Vibrant.findSiteLinks = function() {
 Vibrant.cleanLink = function(_el,_attr) {
 	var domain = parseBaseDomain(document.domain);
 	var re = new RegExp(domain);
-	if (_el.attr(_attr)&&_el.attr(_attr).indexOf('http')!=-1&&!(_el.attr(_attr).match(re))){
+	var badRe = new RegExp(badMatches());
+	if (_el.attr(_attr)&&_el.attr(_attr).indexOf('http')!=-1&&!(_el.attr(_attr).match(re))&&!(_el.attr(_attr).match(badRe))){
 		return(_el.attr(_attr));
 	} else {
 		return false;

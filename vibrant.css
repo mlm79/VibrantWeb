@@ -1,13 +1,18 @@
+.vb {
+
+
+}
+
 #vibrant_main {
 	position:absolute;
 	top:0;
 	right:0;
-	z-index:10000;
+	z-index:100000;
 	background:#efefef;	
 	border: 5px solid white;
 	box-shadow: rgba(0, 0, 0, 0.8) 0px 0px 8px;
 	-webkit-box-shadow: rgba(0, 0, 0, 8) 0px 0px 8px;
-	-moz-border-radius: 0px 0px 15px 15px;
+	-moz-border-radius: 0px 0px 10px 10px;
 	border-radius: 0px 0px 10px 10px;
 	border-top-style: none;
 	margin-right: 30px;
@@ -17,6 +22,32 @@
 	font-family: serif;
 	color:black;
 	text-align: left;
+}
+
+#vb_search_popup {
+	display: none;
+	background:white;
+	z-index:10000;
+	width:180px;
+	height:auto;
+	clear: both;
+	font-family: serif;
+	color:black;
+	text-align: left;
+	border: 5px solid white;
+	box-shadow: rgba(0, 0, 0, 0.8) 0px 0px 8px;
+	-webkit-box-shadow: rgba(0, 0, 0, 8) 0px 0px 8px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border-top-style: none;
+	margin-right: 10px;
+}
+
+#vb_search_list {
+	list-style: none;
+	margin:5px;
+	padding:0;
+	word-wrap:break-word;
 }
 
 #vb_recap {
