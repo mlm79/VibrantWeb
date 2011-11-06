@@ -5,11 +5,12 @@
   "permissions": [
     "tabs", "http://*/*", "https://*/*"
   ],
+  "background_page": "background.html",
   "content_scripts": [
     {
       "matches": ["http://*/*"],
       "css": ["vibrant.css"],
-      "js": ["jquery-1.6.4.min.js","utils.js","vibrant.js"]
+      "js": ["jquery-1.6.4.min.js","jstorage.js","utils.js","vibrant.js"]
     }
   ]
 }

@@ -1,0 +1,37 @@
+<html>
+<head>
+    <script type="text/javascript" src='jquery-1.6.4.min.js'></script>
+    <script type="text/javascript" src='jstorage.js'></script>
+    <script type="text/javascript" src='utils.js'></script>
+  </head>
+<script type="text/javascript">
+	
+	
+	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    	//console.log(sender.tab ? "from a content script:" + sender.tab.url :"from the extension");
+    	var dataLabel = "browsingData";
+    	    	
+    	if (request.method=='get') {
+    		var mydata = {"websites":{},"siteEntities":{}};
+    		if ($.jStorage.index().indexOf(dataLabel)!=-1){
+    			mydata = $.jStorage.get(dataLabel);
+    		} 
+    		sendResponse({method:"getting",data:mydata});
+    	}
+    	    	
+    	if (request.method=='set') {
+    		$.jStorage.set(dataLabel,request.data);
+    		var size = $.jStorage.storageSize();
+    		sendResponse({method:"setting",data:request.data,size:toMBytes(size)});
+    	}
+    	
+    	if (request.method=='delete') {
+    		$.jStorage.deleteKey(dataLabel);
+    		var size = $.jStorage.storageSize();
+    		sendResponse({method:"deleting",size:toMBytes(size)});
+    	}
+    	
+
+ 	});
+</script>
+</html>

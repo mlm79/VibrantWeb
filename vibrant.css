@@ -28,7 +28,7 @@
 	display: none;
 	background:white;
 	z-index:10000;
-	width:180px;
+	width:200px;
 	height:auto;
 	clear: both;
 	font-family: serif;
@@ -41,6 +41,8 @@
 	border-radius: 10px;
 	border-top-style: none;
 	margin-right: 10px;
+	font-size: 12px;
+	padding-top:8px;
 }
 
 #vb_search_list {
@@ -49,6 +51,18 @@
 	padding:0;
 	word-wrap:break-word;
 }
+
+#vb_search_popup a {
+	text-decoration: none;
+	color:blue;
+}
+
+#vb_search_popup li {
+	padding-bottom: 5px;
+	padding-top:5px;
+	border-bottom: 1px solid gray;
+}
+
 
 #vb_recap {
 	height:40px;

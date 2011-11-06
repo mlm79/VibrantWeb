@@ -14,6 +14,11 @@
 
 var Vibrant = Vibrant || {};
 
+Vibrant.sessionObj = Vibrant.sessionObj || {"websites":{},"siteEntities":{}};
+
+Vibrant.sessionOn = true;
+
+
 /* 
 	Vibrant.waiting function
 	@params: none	
@@ -21,11 +26,8 @@ var Vibrant = Vibrant || {};
 	Called before Vibrant.load; inserts HTML template into current window.
 */
 
-Vibrant.CHROME_EXT_ID = 'ajbmfkelgmajcpnhoaiadgnhmeocbidi';
-
 Vibrant.waiting = function() {
 	$('body').prepend("<div id='vibrant_main'></div");
-	//$("#vibrant_main").load('chrome-extension://'+Vibrant.CHROME_EXT_ID+'/recap.html',function(){
 	$("#vibrant_main").load(chrome.extension.getURL('recap.html'),function(){
 		Vibrant.vibrateColors();
 	});
@@ -40,7 +42,27 @@ Vibrant.waiting = function() {
 
 Vibrant.load = function(){
 	var http_links = Vibrant.findSiteLinks();
-	Vibrant.displayLinks(http_links);
+	var title = "Artifacts from "+document.URL;
+	Vibrant.displayLinks(http_links,title);
+	if (Vibrant.sessionOn==true) {
+		Vibrant.loadLinks(http_links);
+	}
+}
+
+Vibrant.startSession = function() {
+	//start recording data
+	Vibrant.sessionOn = true;
+	Vibrant.load();
+}
+
+Vibrant.endSession = function() {
+	//clear data cache
+	chrome.extension.sendRequest({method:"delete"}, function(response) {
+		console.log(response.method);
+		console.log(response.size);
+	});
+	
+	Vibrant.sessionOn = false;
 }
 
 /* 
@@ -59,6 +81,34 @@ Vibrant.vibrateColors = function() {
 	})
 }
 
+Vibrant.loadLinks = function(_http_links) {
+	chrome.extension.sendRequest({method:"get"}, function(response) {
+		console.log(response.method);
+		Vibrant.sessionObj = response.data;
+		
+		var currentUrl = document.URL;
+		Vibrant.sessionObj["websites"][currentUrl] = _http_links;
+		
+		var _obj = Vibrant.sessionObj["siteEntities"];
+		$.each(_http_links,function(k,v){
+			for (var i=0;i<v.length;i++){
+				if (_obj.hasOwnProperty(v[i])) {
+					if (_obj[v[i]]["websites"].indexOf(currentUrl)==-1) {
+						_obj[v[i]]["websites"].push(currentUrl);
+					}
+				} else {
+					_obj[v[i]] = {"type":k,"websites":[currentUrl]};
+				}
+			}
+		})
+		chrome.extension.sendRequest({data: Vibrant.sessionObj,method:"set"}, function(response) {
+			console.log(response.method);
+			console.log(response.data);
+			console.log(response.size);
+		});
+	});		
+}
+
 /* 
 	Vibrant.displayLinks function
 	@params: _http_links - JSON object containing all http calls and cookies from Vibrant.findSiteLinks	
@@ -66,7 +116,8 @@ Vibrant.vibrateColors = function() {
 	Displays 3rd-party-identified links in browser.
 */
 
-Vibrant.displayLinks = function(_http_links) {
+Vibrant.displayLinks = function(_http_links,title) {
+	$("#vb_title").text(title);
 	$.each(_http_links,function(i){
 		$("#vb_"+i+"_count").text(_http_links[i].length);
 		$("#vb_list").append("<h3 id='"+i+"Header"+"'>"+i+"</h3>");
@@ -76,7 +127,11 @@ Vibrant.displayLinks = function(_http_links) {
 		});
 		$("#"+i+"Header").after("<ol>"+links_list+"</ol>");
 	});
-	Vibrant.setSearchDomainName();
+	//Vibrant.setSearchDomainName();
+	chrome.extension.sendRequest({method:"get"}, function(response) {
+		Vibrant.sessionObj = response.data;
+		Vibrant.setCommonWebsites();
+	});
 }
 
 Vibrant.setSearchDomainName = function() {	
@@ -89,24 +144,54 @@ Vibrant.setSearchDomainName = function() {
 				var url = val["url"];
 				var title = val["title"];
 				var blurb = val["titleNoFormatting"];
-				items += "<li><a target='_blank' href='"+url+"'>"+title+"'</a></li>";
+				items += "<li><a target='_blank' href='"+url+"'>"+title+"</a></li>";
 			});		
 	  	});
-		$(this).mouseover(function(){
-			$("#vb_search_list").empty();
-			$("#vb_search_list").append(items);
+		Vibrant.displaySideBar($(this),items);		
+	});	
+}
+
+Vibrant.setCommonWebsites = function() {
+	var _obj = Vibrant.sessionObj["siteEntities"];
+	$('.vb_link').each(function(){
+		var items="";
+		var txt = $(this).text();
+		if (_obj.hasOwnProperty(txt)&&_obj[txt]['websites'].length>0) {
+		
+			//delete reference to current website
+			_obj[txt]['websites'].splice(_obj[txt]['websites'].indexOf(window.location.href),1);
+			
+			var siteArray = _obj[txt]['websites'];
+			if (siteArray.length>0)	{
+				$(this).css({"font-weight":"bold",'color':'red'});
+			}
+			$.each(siteArray,function(i) {
+				var site = siteArray[i];
+				items += "<li><a target='_blank' href='"+site+"'>"+site+"</a></li>";
+			});
+		}		
+		Vibrant.displaySideBar($(this),items);	
+	});
+}
+
+Vibrant.displaySideBar = function(_link,_items) {
+	_link.mouseover(function(){
+		$("#vb_search_list").empty();
+		if (_items!="") {
+			$("#vb_search_list").append(_items);
 			var top = $(this).offset().top;
 			var left = $(this).offset().left;
 			$("#vb_search_popup").offset({top:top,left:left-230});
 			$("#vb_search_popup").show();
-		});
-		
-		$(this).mouseout(function(){
-			//$("#vb_search_list").empty();
-			//$("#vb_search_popup").hide();
-		});
-		
-	});	
+		} else {
+			$("#vb_search_popup").hide();
+		}
+	});
+	
+	_link.mouseout(function(){
+		//$("#vb_search_list").empty();
+		//$("#vb_search_popup").hide();
+	});
 }
 
 /* 
@@ -167,4 +252,4 @@ Vibrant.cleanLink = function(_el,_attr) {
 
 //wait to load so more cookies/http calls can be captured (e.g. beacon imgs)
 Vibrant.waiting();
-window.setTimeout(Vibrant.load,10000);
+window.setTimeout(Vibrant.load,1000);
