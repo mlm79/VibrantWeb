@@ -7,7 +7,9 @@
 
 /* 
 	Vibrant class 
- 	Class variables: none  
+ 	Class variables: 
+ 		- Vibrant.sessionObj : array of entities collected on the site; each entity is an object 
+ 								containing 'domain','site','entity','type','timestamp'  
  	
  	Main container for tool.
 */
@@ -19,7 +21,12 @@ var Vibrant = Vibrant || {};
 
 Vibrant.sessionObj = Vibrant.sessionObj || [];
 
-//Vibrant.sessionOn = true;
+/* 
+	Vibrant.checkSessionState function
+	@params: none	
+	
+	Checks background.html for sessionState. If sessionOn==true, loads VW; if false, nothing happens.
+*/
 
 Vibrant.checkSessionState = function() {
 	chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
@@ -144,6 +151,13 @@ Vibrant.cleanLink = function(_el,_attr) {
 		return false;
 	}
 }
+
+/* 
+	Vibrant.storeSiteEntities function
+	@params: none
+	
+	Send Vibrant.sessionObj to background.html to be added to "browsingData" storage
+*/
 
 Vibrant.storeSiteEntities = function() {
 	if (Vibrant.sessionObj.length>0) {
