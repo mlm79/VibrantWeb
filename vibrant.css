@@ -131,4 +131,5 @@
 	margin-bottom: 5px;
 	list-style-position: outside;
 	list-style: decimal;
+	cursor: pointer;
 }

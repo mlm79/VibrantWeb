@@ -14,7 +14,7 @@ function parseBaseDomainFromLink(_http_link) {
 }
 
 function badMatches() {
-	var re = /(cdn\.|\/$)/; //match cdn, links to website
+	var re = /(cdn\.|\/$|\.png$|\.gif$|\.jpg$)/; //match cdn, links to website
 	return re;
 }
 

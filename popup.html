@@ -1,0 +1,50 @@
+<html>
+
+<head>
+    <script type="text/javascript" src='jquery-1.6.4.min.js'></script>
+    <script type="text/javascript" src='jstorage.js'></script>
+    <script type="text/javascript" src='utils.js'></script>
+  </head>
+
+<style>
+body {
+  min-width:150px;
+  overflow-x:hidden;
+}
+
+img {
+  margin:5px;
+  border:2px solid black;
+  vertical-align:middle;
+  width:75px;
+  height:75px;
+}
+</style>
+
+<body>
+	<div id='sessionOn'>ON</div>
+	<div>Clear Artifact History</div>
+	<div>Visualize</div>
+	
+	
+	
+</body>
+
+<script type="text/javascript">
+	chrome.extension.onRequest.addListener(function(links){
+		var windowId = chrome.windows.getCurrent(function(i){console.log('got window: '+i.id)});
+		chrome.tabs.getSelected(windowId,function(i){
+			displayLinks("url: "+i.url,_links);
+		});
+	});
+	
+	$("#sessionOn").click(function(){
+		var bg = chrome.extension.getBackgroundPage();
+		console.log(bg.VibrantWeb_SessionState); 
+    	//bg.VibrantWeb_SessionState.ON=false; 
+    	//bg.port.postMessage({state: bg.VibrantWeb_SessionState.ON});
+    	$(this).text("OFF");
+	});
+
+</script>
+</html>

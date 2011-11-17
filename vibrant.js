@@ -18,6 +18,9 @@ Vibrant.sessionObj = Vibrant.sessionObj || {"websites":{},"siteEntities":{}};
 
 Vibrant.sessionOn = true;
 
+Vibrant.updateSession = function(state) {
+	Vibrant.sessionOn = state;
+}
 
 /* 
 	Vibrant.waiting function
@@ -29,6 +32,7 @@ Vibrant.sessionOn = true;
 Vibrant.waiting = function() {
 	$('body').prepend("<div id='vibrant_main'></div");
 	$("#vibrant_main").load(chrome.extension.getURL('recap.html'),function(){
+		console.log(chrome.extension.getURL('recap.html'));
 		Vibrant.vibrateColors();
 	});
 }
@@ -44,25 +48,20 @@ Vibrant.load = function(){
 	var http_links = Vibrant.findSiteLinks();
 	var title = "Artifacts from "+document.URL;
 	Vibrant.displayLinks(http_links,title);
-	if (Vibrant.sessionOn==true) {
-		Vibrant.loadLinks(http_links);
-	}
+	Vibrant.loadLinks(http_links);
 }
 
 Vibrant.startSession = function() {
 	//start recording data
-	Vibrant.sessionOn = true;
 	Vibrant.load();
 }
 
-Vibrant.endSession = function() {
+Vibrant.deleteSessionData = function() {
 	//clear data cache
 	chrome.extension.sendRequest({method:"delete"}, function(response) {
 		console.log(response.method);
 		console.log(response.size);
 	});
-	
-	Vibrant.sessionOn = false;
 }
 
 /* 
@@ -217,6 +216,7 @@ Vibrant.findSiteLinks = function() {
 		$(el_types[i]["el_match"],document).each(function(){
 			var cleanLink = Vibrant.cleanLink($(this),el_types[i]["attr_match"]);		
 			if (cleanLink){
+				//$(this).css({'border':'5px solid red'});
 				json_response[el_types[i]["name"]].push(cleanLink);
 			}
 		});
@@ -249,6 +249,21 @@ Vibrant.cleanLink = function(_el,_attr) {
 		return false;
 	}
 }
+
+/*
+chrome.extension.onConnect.addListener(function(port) {
+	console.assert(port.name == "VibrantWeb_state");
+	port.onMessage.addListener(function(msg) {
+		console.log(msg.state);
+	});
+	
+	if (typeof(msg.state) != 'undefined')
+		Vibrant.updateSession(msg.state);
+	else if (typeof(msg.clearCache) != 'undefined'&&msg.clearCache==false)
+		Vibrant.deleteSessionData();
+		
+});
+*/
 
 //wait to load so more cookies/http calls can be captured (e.g. beacon imgs)
 Vibrant.waiting();
