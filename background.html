@@ -5,61 +5,56 @@
     <script type="text/javascript" src='utils.js'></script>
   </head>
 <script type="text/javascript">
-	/* Data object
-		siteEntites: [link=>type,websites[]]	
 	
-		websites: [website=>cookies,frames,images,links,scripts]		
-	
-	*/	
-	
-	
-	var VibrantWeb_SessionState = VibrantWeb_SessionState || {
-		ON: true
+	function getLocalDataObj(dataLabel,obj) {
+		var _data = obj;
+		if ($.jStorage.index().indexOf(dataLabel)!=-1&&typeof($.jStorage.get(dataLabel))!='undefined'){
+    		_data = $.jStorage.get(dataLabel);    		
+    	}
+    	return _data;
 	}
 	
-	console.log();
-	
+	var dataTypes = {
+		browsingData: {
+			obj: {"entities":[]},
+			update: function(_obj,_data) {
+				_obj["entities"] = _obj["entities"].concat(_data);
+				return _obj;
+			}
+		},
+		sessionState: {
+			obj: {"sessionOn":true},
+			update: function(_obj,_data) {
+				_obj["sessionOn"] = _data["sessionOn"];
+			}
+		}
+	}
 	
 	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     	//console.log(sender.tab ? "from a content script:" + sender.tab.url :"from the extension");
-    	var dataLabel = "browsingData";
-    	    	
-    	if (request.method=='get') {
-    		var mydata = {"websites":{},"siteEntities":{}};
-    		if ($.jStorage.index().indexOf(dataLabel)!=-1){
-    			mydata = $.jStorage.get(dataLabel);
-    		} 
-    		sendResponse({method:"getting",data:mydata});
-    	}
-    	    	
-    	if (request.method=='set') {
-    		$.jStorage.set(dataLabel,request.data);
-    		var size = $.jStorage.storageSize();
-    		sendResponse({method:"setting",data:request.data,size:toMBytes(size)});
-    	}
     	
-    	if (request.method=='delete') {
-    		$.jStorage.deleteKey(dataLabel);
-    		var size = $.jStorage.storageSize();
-    		sendResponse({method:"deleting",size:toMBytes(size)});
+    	switch(request.method) {
+    		case 'get':
+    			var _obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
+	    		sendResponse({method:"getting",data:_obj})
+	    		break;
+	    	
+	    	case 'set':
+    			var _obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
+    			_obj = dataTypes[request.dataLabel].update(_obj,request.data);	    		
+	    		$.jStorage.set(request.dataLabel,_obj);
+	    		var size = $.jStorage.storageSize();
+	    		sendResponse({method:"setting",data:_obj,size:toMBytes(size)});
+				break;
+				
+			case 'delete':
+				$.jStorage.deleteKey(request.dataLabel);
+	    		var size = $.jStorage.storageSize();
+	    		sendResponse({method:"deleting",size:toMBytes(size)});
+				break;	
     	}
-    	
 
  	});
- 	
- 	var port = chrome.extension.connect({name: "VibrantWeb_state"});
- 	port.postMessage({state:VibrantWeb_SessionState.ON});
- 	/*
-	port.onMessage.addListener(function(msg) {
-		if (msg.question == "Who's there?")
-	    	port.postMessage({answer: "Madame"});
-	  	else if (msg.question == "Madame who?")
-	    	port.postMessage({answer: "Madame... Bovary"});
-	});
-	*/
- 	
-	
-});
- 	
+
 </script>
 </html>

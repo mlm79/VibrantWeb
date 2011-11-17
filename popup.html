@@ -23,8 +23,8 @@ img {
 
 <body>
 	<div id='sessionOn'>ON</div>
-	<div>Clear Artifact History</div>
-	<div>Visualize</div>
+	<a id='clearCache'>Clear Artifact History</a>
+	<div id='homepage'>Visualize</div>
 	
 	
 	
@@ -39,12 +39,24 @@ img {
 	});
 	
 	$("#sessionOn").click(function(){
-		var bg = chrome.extension.getBackgroundPage();
-		console.log(bg.VibrantWeb_SessionState); 
-    	//bg.VibrantWeb_SessionState.ON=false; 
-    	//bg.port.postMessage({state: bg.VibrantWeb_SessionState.ON});
+    	chrome.extension.sendRequest({method:"set",dataLabel:"sessionState",data:{"sessionOn":false}}, function(response) {
+			console.log(response.method);
+			console.log(response.data);
+		});
     	$(this).text("OFF");
 	});
+	
+	$("#clearCache").click(function() {
+		chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
+			console.log(response.method);
+			console.log(response.size);
+		});	
+	})
+	
+	$("#homepage").click(function(){
+		chrome.tabs.create({url:chrome.extension.getURL('landingpage.html')});
+		window.close();
+	})
 
 </script>
 </html>
