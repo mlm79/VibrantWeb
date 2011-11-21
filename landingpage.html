@@ -1,4 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
-<head></head>
-<body>I'm here</body>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<script type="text/javascript" src='js/jquery-1.6.4.min.js'></script>
+		<script type="text/javascript" src='js/jquery.tablesorter.min.js'></script>
+	    <script type="text/javascript" src='js/utils.js'></script>
+	   	<script type="text/javascript" src='js/vibrant_new.js'></script>
+	   	<link rel="stylesheet" href="css/blue/style.css" />
+	   	<link rel="stylesheet" href="css/landingpage.css" />
+	</head>
+	<body>
+	 	<script type="text/javascript">
+	 		var response = {};
+	 		
+	 		chrome.extension.sendRequest({method:"get",dataLabel:"browsingData"}, function(response) {
+	 			var entities = response.data.entities
+	 			if (entities.length>0) {
+	 				var table = Vibrant.viewDataAsTable(entities);
+	    			$('body').append(table);
+	    			$("#myTable").tablesorter();
+	    		} else {
+	    			$('body').append("<div id='noResults'>You currently have no Vibrant history.</div>");
+	    		}
+	 		
+	 		});
+	 		
+	 		/*
+	    	Vibrant.retrieveDataFromBackground("browsingData",function(r){
+	    		var table = Vibrant.viewDataAsTable(r.data.entities);
+	    		$('body').append(table);
+	    		if ($('table').length>0){
+	    			$("#myTable").tablesorter();
+	    			console.log('tried');
+	    		} else {
+	    			$('body').append("div id='noResults'>You currently have no Vibrant history.</div>");
+	    		}
+	    	});
+	    	*/
+	    </script>
+	
+	
+	</body>
 </html>

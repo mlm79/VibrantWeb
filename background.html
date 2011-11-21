@@ -1,18 +1,39 @@
 <html>
 <head>
-    <script type="text/javascript" src='jquery-1.6.4.min.js'></script>
-    <script type="text/javascript" src='jstorage.js'></script>
-    <script type="text/javascript" src='utils.js'></script>
+    <script type="text/javascript" src='js/jquery-1.6.4.min.js'></script>
+    <script type="text/javascript" src='js/jstorage.js'></script>
+    <script type="text/javascript" src='js/utils.js'></script>
   </head>
 <script type="text/javascript">
 	
+	/* 
+	getLocalDataObj function
+	@params: dataLabel - string, name of data object in local storage
+			 obj - object, empty structure of data object associated with dataLabel
+	
+	Checks if there is already data stored for the dataLabel; if so, returns it; 
+	if not, returns the empty object with appropriate structure.
+	*/
+	
 	function getLocalDataObj(dataLabel,obj) {
 		var _data = obj;
+		console.log("_data1: ");
+		console.log(_data);
 		if ($.jStorage.index().indexOf(dataLabel)!=-1&&typeof($.jStorage.get(dataLabel))!='undefined'){
-    		_data = $.jStorage.get(dataLabel);    		
+    		_data = $.jStorage.get(dataLabel); 
+    		console.log("_data2: ");
+			console.log(_data);   		
     	}
     	return _data;
 	}
+	
+	/* 
+	dataTypes object
+	
+	Defines the kinds of data stored locally. Label for data object => data object structure, update function for adding data to object.
+	
+	TO DO: add function for deleting data; e.g. when space runs out, delete old data.
+	*/
 	
 	var dataTypes = {
 		browsingData: {
@@ -23,37 +44,47 @@
 			}
 		},
 		sessionState: {
-			obj: {"sessionOn":true},
+			obj: {"sessionOn":false},
 			update: function(_obj,_data) {
 				_obj["sessionOn"] = _data["sessionOn"];
 			}
 		}
 	}
 	
+	/* 
+	chrome.extension.onRequest.addListener function
+	
+	@params: sender - object, where the request originated from
+			 request - obejct, the message sent
+			 sendResponse - function, takes object to be returned to sender
+	
+	Listens to both web site actions (via vibrant_new.js) and popup.html actions. Provides functions for
+	getting, setting, and updating local data storage.
+	*/
+	
 	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-    	//console.log(sender.tab ? "from a content script:" + sender.tab.url :"from the extension");
-    	
+    	//console.log(sender.tab ? "from a content script:" + sender.tab.url :"from the extension");  
+    	var _obj = {};  	
     	switch(request.method) {
     		case 'get':
-    			var _obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
-	    		sendResponse({method:"getting",data:_obj})
+    			_obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
 	    		break;
 	    	
 	    	case 'set':
-    			var _obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
-    			_obj = dataTypes[request.dataLabel].update(_obj,request.data);	    		
-	    		$.jStorage.set(request.dataLabel,_obj);
-	    		var size = $.jStorage.storageSize();
-	    		sendResponse({method:"setting",data:_obj,size:toMBytes(size)});
+    			_obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
+    			_obj = dataTypes[request.dataLabel].update(_obj,request.data);	
+    			$.jStorage.set(request.dataLabel,_obj);    		
 				break;
 				
 			case 'delete':
 				$.jStorage.deleteKey(request.dataLabel);
-	    		var size = $.jStorage.storageSize();
-	    		sendResponse({method:"deleting",size:toMBytes(size)});
 				break;	
     	}
-
+    	
+    	var size = $.jStorage.storageSize();
+	    sendResponse({method:request.method,data:_obj,size:toMBytes(size)});
+		_obj = {};
+  
  	});
 
 </script>

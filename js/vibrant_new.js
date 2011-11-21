@@ -30,10 +30,7 @@ Vibrant.sessionObj = Vibrant.sessionObj || [];
 
 Vibrant.checkSessionState = function() {
 	chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
-		console.log(response.method);
-		console.log(response.data);
-		
-		if (response.data["sessionOn"]) {
+		if (response.data["sessionOn"]&&isGoodUrl()) {
 			console.log("starting");
 			Vibrant.waiting();
 			window.setTimeout(Vibrant.load,1000);
@@ -170,6 +167,35 @@ Vibrant.storeSiteEntities = function() {
 		console.log("No entities to store.");	
 	}
 
+}
+
+/*============================ DISPLAY DATA =======================================*/
+
+Vibrant.retrieveDataFromBackground = function(_dataLabel,f) {
+	chrome.extension.sendRequest({method:"get",dataLabel:_dataLabel}, function(response) {
+		console.log(response.method);
+		console.log(response.data);
+		console.log(response.size);
+		if (typeof f == "function") f(response); else console.log(f+'is not a function');
+	});
+}
+
+Vibrant.viewDataAsTable = function(_data) {
+	var str="<table id='myTable' class='tablesorter'><thead><tr>";
+	$.each(_data[0],function(k,v){
+		str+="<th class='"+k+"_head'>"+k+"</th>";
+	})
+	str+="</tr></thead><tbody>";
+
+	for (var i=0; i < _data.length; i++) {
+		str+="<tr>";
+		$.each(_data[i],function(k,v){
+			str+="<td class='"+k+"'>"+v+"</td>";
+		})
+		str+="</tr>";
+	}
+	str+="</tbody></table>"
+	return str;
 }
 
 

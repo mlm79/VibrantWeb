@@ -21,3 +21,8 @@ function badMatches() {
 function toMBytes(bytes) {
 	return bytes/1024/1024+"M";
 }
+
+function isGoodUrl() {
+	var re = /(^chrome-extension:\/\/)/;
+	return document.URL.match(re)==null;
+}

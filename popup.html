@@ -1,90 +1,20 @@
 <html>
 
 <head>
-    <script type="text/javascript" src='jquery-1.6.4.min.js'></script>
-    <script type="text/javascript" src='jstorage.js'></script>
-    <script type="text/javascript" src='utils.js'></script>
+    <script type="text/javascript" src='js/jquery-1.6.4.min.js'></script>
+    <script type="text/javascript" src='js/jstorage.js'></script>
+    <script type="text/javascript" src='js/utils.js'></script>
+    <link rel="stylesheet" href="css/popup.css" />
   </head>
 
 <style>
-body {
-	width:160px;
-  	height:auto;
-  	color:white;
-  	background:#181818;
-}
-
-#main {
-	margin:10px 0px;
-	height:auto;
-}
-
-#title {
-	font-size:20px;
-	margin-bottom:10px;
-	text-align:center;
-}
-
-#homepage {
-	width:90%;	
-	/*background: -webkit-gradient(linear, left top, right bottom, from(#ad046b), to(#575155));*/
-	background-image: url('myweb.png');
-	-webkit-border-radius: 8px;
-	margin:auto;
-  	border:2px solid black;
-  	vertical-align:middle;
-  	height:54px;
-  	cursor:pointer;
-  	font-family:sans-serif;
-  	font-size:32px;
-  	text-align:center;
-  	padding-top:21px;
-}
-
-#clearHistory {
-	/*
-	background:#efefef;
-	-webkit-border-radius: 10px;
-	*/
-	color:#bbb;
-	font-size:14px;
-	text-decoration:underline;
-	float:right;
-	margin:0px 5% 10px 40%;
-	padding:2px 5px;
-	cursor:pointer;
-}
-
-#clearHistory:hover {
-	color:white;
-
-}
-.button {
-	width:34px;
-	height:20px;
-	margin: 10px 5% 10px 0px;
-	float:right;
-	padding: 2px;
-	text-align:center;
-	cursor:pointer;
-	-webkit-border-radius: 4px;
-	-webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.3);
-}
-
-.selected {
-	background:#83ad04;
-}
-
-.de-selected {
-	background:#323232;
-}
 
 </style>
 
 <body>
 	<div id="main">
-		<div id="title">The Vibrant Web</div>
-		<div id="homepage">My Web</div>
+		<div id="title"></div>
+		<div id="homepage"></div>
 		<div id="onOff">
 			<div class='button' id="sessionOff">OFF</div>
 			<div class='button' id="sessionOn">ON</div>

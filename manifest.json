@@ -3,19 +3,20 @@
   "version": "1.0",
   "description": "Mining and visualizing 3rd-party .",
   "permissions": [
-    "tabs", "http://*/*", "https://*/*"
+    "http://*/*", "https://*/*"
   ],
   "background_page": "background.html",
   "content_scripts": [
     {
       "matches": ["http://*/*"],
-      "css": ["vibrant.css"],
-      "js": ["jquery-1.6.4.min.js","jstorage.js","utils.js","vibrant_new.js"]
+      "css": ["css/vibrant.css"],
+      "js": ["js/jquery-1.6.4.min.js","js/jstorage.js","js/utils.js","js/vibrant_new.js"]
     }
   ],
   "browser_action": {
     "default_title": "VibrantWeb",  
-    "default_icon": "icon.png",
+    "default_icon": "imgs/icon.png",
     "popup": "popup.html"
   }
 }
+
