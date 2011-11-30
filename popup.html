@@ -60,8 +60,10 @@
 	
 	$("#clearHistory").click(function() {
 		chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
+			chrome.tabs.create({url:chrome.extension.getURL('landingpage.html')});
 			console.log(response.method);
 			console.log(response.size);
+			console.log(response.data);
 		});	
 	})
 	

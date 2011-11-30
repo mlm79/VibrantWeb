@@ -20,24 +20,12 @@
 	 				var table = Vibrant.viewDataAsTable(entities);
 	    			$('body').append(table);
 	    			$("#myTable").tablesorter();
+	    			//$('body').append("<div id='noResults'>You have "+entities.length+" Vibrant history.</div>");
 	    		} else {
 	    			$('body').append("<div id='noResults'>You currently have no Vibrant history.</div>");
 	    		}
 	 		
 	 		});
-	 		
-	 		/*
-	    	Vibrant.retrieveDataFromBackground("browsingData",function(r){
-	    		var table = Vibrant.viewDataAsTable(r.data.entities);
-	    		$('body').append(table);
-	    		if ($('table').length>0){
-	    			$("#myTable").tablesorter();
-	    			console.log('tried');
-	    		} else {
-	    			$('body').append("div id='noResults'>You currently have no Vibrant history.</div>");
-	    		}
-	    	});
-	    	*/
 	    </script>
 	
 	

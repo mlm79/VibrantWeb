@@ -7,50 +7,70 @@
 <script type="text/javascript">
 	
 	/* 
-	getLocalDataObj function
+	getDataShell function
+	
 	@params: dataLabel - string, name of data object in local storage
-			 obj - object, empty structure of data object associated with dataLabel
-	
-	Checks if there is already data stored for the dataLabel; if so, returns it; 
-	if not, returns the empty object with appropriate structure.
-	*/
-	
-	function getLocalDataObj(dataLabel,obj) {
-		var _data = obj;
-		console.log("_data1: ");
-		console.log(_data);
-		if ($.jStorage.index().indexOf(dataLabel)!=-1&&typeof($.jStorage.get(dataLabel))!='undefined'){
-    		_data = $.jStorage.get(dataLabel); 
-    		console.log("_data2: ");
-			console.log(_data);   		
-    	}
-    	return _data;
-	}
-	
-	/* 
-	dataTypes object
-	
+			returnType - dataType[dataLabel] property to be returned
+			
 	Defines the kinds of data stored locally. Label for data object => data object structure, update function for adding data to object.
 	
 	TO DO: add function for deleting data; e.g. when space runs out, delete old data.
 	*/
 	
-	var dataTypes = {
-		browsingData: {
-			obj: {"entities":[]},
-			update: function(_obj,_data) {
-				_obj["entities"] = _obj["entities"].concat(_data);
-				return _obj;
-			}
-		},
-		sessionState: {
-			obj: {"sessionOn":false},
-			update: function(_obj,_data) {
-				_obj["sessionOn"] = _data["sessionOn"];
+	function getDataShell(_dataLabel,returnType) {
+		var dataTypes = {
+			browsingData: {
+				obj: {"entities":[]},
+				update: function(_obj,_data) {
+					_obj["entities"] = _obj["entities"].concat(_data);
+					return _obj;
+				}
+			},
+			sessionState: {
+				obj: {"sessionOn":false},
+				update: function(_obj,_data) {
+					_obj["sessionOn"] = _data["sessionOn"];
+					return _obj;
+				}
 			}
 		}
+		return dataTypes[_dataLabel][returnType];
 	}
 	
+	/* 
+	getLocalDataObj function
+	
+	@params: dataLabel - string, name of data object in local storage
+	
+	Get either the stored data object, or the empty shell, e.g. {"entities":[]}
+	
+	*/
+	
+	function getLocalDataObj(dataLabel) {
+		var _data = getDataShell(dataLabel,'obj');;
+		if ($.jStorage.index().indexOf(dataLabel)!=-1&&typeof($.jStorage.get(dataLabel))!='undefined'){
+    		_data = $.jStorage.get(dataLabel);  		
+    	} 
+    	return _data;
+	}
+	
+	/* 
+	setLocalDataObj function
+	
+	@params: dataLabel - string, name of data object in local storage
+			new_data - array of entities from current web session, sent via request object
+	
+	Update and set the local storage object
+	
+	*/
+	
+	function setLocalDataObj(dataLabel,new_data) {
+		var data = getLocalDataObj(dataLabel);
+		var updateFunc = getDataShell(dataLabel,'update');
+		$.jStorage.set(dataLabel,updateFunc(data,new_data));
+	}
+
+		
 	/* 
 	chrome.extension.onRequest.addListener function
 	
@@ -64,16 +84,14 @@
 	
 	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     	//console.log(sender.tab ? "from a content script:" + sender.tab.url :"from the extension");  
-    	var _obj = {};  	
+    	
     	switch(request.method) {
     		case 'get':
-    			_obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
+				//Nothing happens in here; all methods get the final object and pass it back to the browser
 	    		break;
 	    	
-	    	case 'set':
-    			_obj = getLocalDataObj(request.dataLabel,dataTypes[request.dataLabel].obj);
-    			_obj = dataTypes[request.dataLabel].update(_obj,request.data);	
-    			$.jStorage.set(request.dataLabel,_obj);    		
+	    	case 'set':   
+    			setLocalDataObj(request.dataLabel,request.data);		
 				break;
 				
 			case 'delete':
@@ -81,9 +99,9 @@
 				break;	
     	}
     	
+    	var _obj = getLocalDataObj(request.dataLabel);
     	var size = $.jStorage.storageSize();
 	    sendResponse({method:request.method,data:_obj,size:toMBytes(size)});
-		_obj = {};
   
  	});
 

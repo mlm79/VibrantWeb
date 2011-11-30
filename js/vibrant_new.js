@@ -19,7 +19,7 @@
 
 var Vibrant = Vibrant || {};
 
-Vibrant.sessionObj = Vibrant.sessionObj || [];
+//Vibrant.sessionObj = Vibrant.sessionObj || [];
 
 /* 
 	Vibrant.checkSessionState function
@@ -81,10 +81,9 @@ Vibrant.vibrateColors = function() {
 */
 
 Vibrant.load = function(){
-	//var http_links = Vibrant.findSiteLinks();
-	Vibrant.sessionObj = Vibrant.collectSiteEntities();
+	var siteEntities = Vibrant.collectSiteEntities();
 	var title = "Artifacts from "+document.URL;
-	Vibrant.storeSiteEntities();
+	Vibrant.storeSiteEntities(siteEntities);
 }
 
 
@@ -156,9 +155,9 @@ Vibrant.cleanLink = function(_el,_attr) {
 	Send Vibrant.sessionObj to background.html to be added to "browsingData" storage
 */
 
-Vibrant.storeSiteEntities = function() {
-	if (Vibrant.sessionObj.length>0) {
-		chrome.extension.sendRequest({data: Vibrant.sessionObj,method:"set",dataLabel:"browsingData"}, function(response) {
+Vibrant.storeSiteEntities = function(_siteEntities) {
+	if (_siteEntities.length>0) {
+		chrome.extension.sendRequest({data: _siteEntities,method:"set",dataLabel:"browsingData"}, function(response) {
 			console.log(response.method);
 			console.log(response.data);
 			console.log(response.size);
@@ -170,15 +169,6 @@ Vibrant.storeSiteEntities = function() {
 }
 
 /*============================ DISPLAY DATA =======================================*/
-
-Vibrant.retrieveDataFromBackground = function(_dataLabel,f) {
-	chrome.extension.sendRequest({method:"get",dataLabel:_dataLabel}, function(response) {
-		console.log(response.method);
-		console.log(response.data);
-		console.log(response.size);
-		if (typeof f == "function") f(response); else console.log(f+'is not a function');
-	});
-}
 
 Vibrant.viewDataAsTable = function(_data) {
 	var str="<table id='myTable' class='tablesorter'><thead><tr>";
