@@ -19,7 +19,7 @@
 
 var Vibrant = Vibrant || {};
 
-//Vibrant.sessionObj = Vibrant.sessionObj || [];
+Vibrant.sessionObj = {};
 
 /* 
 	Vibrant.checkSessionState function
@@ -32,11 +32,19 @@ Vibrant.checkSessionState = function() {
 	chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
 		if (response.data["sessionOn"]&&isGoodUrl()) {
 			console.log("starting");
-			Vibrant.waiting();
 			window.setTimeout(Vibrant.load,1000);
+			Vibrant.startTab();
 		}
 	});
 }
+
+Vibrant.startTab = function(){
+	$('body').prepend("<div class='vb_tab' id='vb_showViz'></div>")
+	$('#vb_showViz').click(function(){
+		//sketch();	
+	})
+}
+
 
 /* 
 	Vibrant.waiting function
@@ -46,7 +54,7 @@ Vibrant.checkSessionState = function() {
 */
 
 Vibrant.waiting = function() {
-	$('body').prepend("<div id='vibrant_main'></div");
+	$('body').prepend("<div class='vb_tab' id='vibrant_main'></div");
 	$("#vibrant_main").load(chrome.extension.getURL('recap.html'),function(){
 		console.log(chrome.extension.getURL('recap.html'));
 		Vibrant.vibrateColors();
@@ -82,6 +90,7 @@ Vibrant.vibrateColors = function() {
 
 Vibrant.load = function(){
 	var siteEntities = Vibrant.collectSiteEntities();
+	Vibrant.sessionObj = siteEntities;
 	var title = "Artifacts from "+document.URL;
 	Vibrant.storeSiteEntities(siteEntities);
 }

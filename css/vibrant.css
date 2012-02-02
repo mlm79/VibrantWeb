@@ -1,9 +1,13 @@
-.vb {
-
-
+#vb_canvas {
+	position: absolute;
+	top:150px;
+	left:250px;
+	z-index:10000;
+	background: black;
+	border-radius: 50%;
 }
 
-#vibrant_main {
+.vb_tab {
 	position:absolute;
 	top:0;
 	right:0;
@@ -22,6 +26,7 @@
 	font-family: serif;
 	color:black;
 	text-align: left;
+	cursor:pointer;
 }
 
 #vb_search_popup {
@@ -43,6 +48,11 @@
 	margin-right: 10px;
 	font-size: 12px;
 	padding-top:8px;
+}
+
+#vb_showViz {
+	width: 30px;
+	height: 30px;
 }
 
 #vb_search_list {

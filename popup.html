@@ -1,76 +1,129 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
+    <title>Vibrant Web</title>
     <script type="text/javascript" src='js/jquery-1.6.4.min.js'></script>
+    <script type="text/javascript" src='js/jquery.tablesorter.min.js'></script>
     <script type="text/javascript" src='js/jstorage.js'></script>
     <script type="text/javascript" src='js/utils.js'></script>
-    <link rel="stylesheet" href="css/popup.css" />
+    <link rel="stylesheet" href="css/blue/style.css" />
+    <link rel="stylesheet" href="css/leaderboard.css" />
   </head>
-
-<style>
-
-</style>
 
 <body>
 	<div id="main">
-		<div id="title"></div>
-		<div id="homepage"></div>
-		<div id="onOff">
-			<div class='button' id="sessionOff">OFF</div>
-			<div class='button' id="sessionOn">ON</div>
+		<div id="trigger"></div>
+		<div id="settings" class="clearfix">
+			
+			<div id="controls">
+				<div id="onOff">
+					<div class='button' id="sessionOff">OFF</div>
+					<div class='button' id="sessionOn">ON</div>
+				</div>
+				<div id="clearHistory">clear history</div>
+			</div>
+			<div id="title">The Vibrant Web</div>
+			
 		</div>
-		<div id="clearHistory">clear history</div>
-	</div>	
-</body>
-
-<script type="text/javascript">
-	var btns = {
-		sessionOn: {
-			val:true
-		},
-		sessionOff: {
-			val:false
+		<div id="leaderboard">
+		
+		
+		</div>
+		<div id="footer">
+			<span>Sites visited since </span>
+			<span id="since_date">1/22/12</span>
+			<span>: </span>
+			<span id="count_sites">213</span>
+		</div>
+	
+	
+	
+	
+	</div>
+	
+	
+	<script type="text/javascript">
+		var btns = {
+			sessionOn: {
+				val:true
+			},
+			sessionOff: {
+				val:false
+			}
 		}
-	}
-
-	chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
-		console.log(response.method);
-		console.log(response.data["sessionOn"]);
-		if (response.data["sessionOn"]) {
-			$("#sessionOn").addClass("selected");
-			$("#sessionOff").addClass("de-selected");
-		} else {
-			$("#sessionOff").addClass("selected");
-			$("#sessionOn").addClass("de-selected");
+	
+		chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
+			console.log(response.method);
+			console.log(response.data["sessionOn"]);
+			if (response.data["sessionOn"]) {
+				$("#sessionOn").addClass("selected");
+				$("#sessionOff").addClass("de-selected");
+			} else {
+				$("#sessionOff").addClass("selected");
+				$("#sessionOn").addClass("de-selected");
+			}
+			
+		});
+	
+	
+	
+		$(".button").click(function(){
+			$(this).removeClass("de-selected").addClass("selected");
+			$(this).siblings().removeClass("selected").addClass("de-selected");
+			var val = btns[$(this).attr('id')].val;
+	    	chrome.extension.sendRequest({method:"set",dataLabel:"sessionState",data:{"sessionOn":val}}, function(response) {
+				console.log(response.method);
+				console.log(response.data);
+			});
+		});
+		
+		$("#clearHistory").click(function() {
+			chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
+				chrome.tabs.create({url:chrome.extension.getURL('home.html')});
+				console.log(response.method);
+				console.log(response.size);
+				console.log(response.data);
+			});	
+		})
+		
+		$("#homepage").click(function(){
+			chrome.tabs.create({url:chrome.extension.getURL('home.html')});
+			window.close();
+		})
+		
+		
+		function viewDataAsTable(_data) {
+			var str="<table id='myTable' class='tablesorter'><thead><tr>";
+			
+			str+="<th class='domain_head'>Domain</th><th class='count_head'>Count</th>";
+			str+="</tr></thead><tbody>";
+		
+			$.each(_data,function(k,v){
+				str+="<tr><td class='domain_td'><a href='http://"+k+"'>"+k+"</a></td><td class='count_td'>"+v+"</td></tr>";
+			})
+			str+="</tbody></table>";
+			
+			return str;
 		}
 		
-	});
-
-
-
-	$(".button").click(function(){
-		$(this).removeClass("de-selected").addClass("selected");
-		$(this).siblings().removeClass("selected").addClass("de-selected");
-		var val = btns[$(this).attr('id')].val;
-    	chrome.extension.sendRequest({method:"set",dataLabel:"sessionState",data:{"sessionOn":val}}, function(response) {
-			console.log(response.method);
-			console.log(response.data);
+		chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
+			var domains = response.data;
+			console.log(domains);
+			var len = Object.keys(domains).length;
+			console.log(len);
+			if (!(len>0)) {
+				$('#leaderboard').append("<div id='noResults'>You currently have no Vibrant history.</div>");
+			} else {
+				var table = viewDataAsTable(domains);
+			    $('#leaderboard').append(table);
+			    $("#myTable").tablesorter();
+			}
+		
 		});
-	});
-	
-	$("#clearHistory").click(function() {
-		chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
-			chrome.tabs.create({url:chrome.extension.getURL('landingpage.html')});
-			console.log(response.method);
-			console.log(response.size);
-			console.log(response.data);
-		});	
-	})
-	
-	$("#homepage").click(function(){
-		chrome.tabs.create({url:chrome.extension.getURL('landingpage.html')});
-		window.close();
-	})
 
-</script>
+	
+	</script>
+</body>
 </html>

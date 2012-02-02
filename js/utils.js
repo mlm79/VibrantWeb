@@ -26,3 +26,19 @@ function isGoodUrl() {
 	var re = /(^chrome-extension:\/\/)/;
 	return document.URL.match(re)==null;
 }
+
+
+/** 
+  *
+  * UI Controls
+  *
+ **/
+ 
+$(document).ready(function(){
+	$("#trigger").mouseover(function(){
+		$("#settings").slideToggle(200);
+	});
+	$("#settings").mouseleave(function(){
+		$("#settings").slideToggle(200);
+	});
+});

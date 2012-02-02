@@ -1,14 +1,27 @@
+
+html {
+  	margin:0;
+  	padding:0;
+  	width:135px;
+}
+
+
 body {
 	width:160px;
   	height:auto;
   	color:white;
   	background:#181818;
   	font-family: "moby-monospace-1", "moby-monospace-2",serif;
+  	margin:0;
+  	padding:0;
+  	min-width: 0;
+  	overflow:hidden;
 }
 
 #main {
 	margin:10px 0px;
 	height:auto;
+	float:right;
 }
 
 #title {

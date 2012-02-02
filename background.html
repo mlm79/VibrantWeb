@@ -55,6 +55,35 @@
 	}
 	
 	/* 
+	sortLocalDataObj function
+	
+	@params: sort_type - string, sort by what
+			_obj - local data obj
+	
+	Return sorted object
+	
+	*/
+	
+	function sortLocalDataObj(_obj,sort_type) {
+		var _data = {};
+		if (sort_type=='by_domain'){
+			for (var i in _obj.entities){
+				var entity = parseBaseDomainFromLink(_obj.entities[i].entity);
+				if (_data[entity]==null){
+					_data[entity]=0;
+				}
+				_data[entity]++;
+			}
+		} else {
+			_data = _obj;
+		}
+		
+		return _data;
+	}
+	
+	
+	
+	/* 
 	setLocalDataObj function
 	
 	@params: dataLabel - string, name of data object in local storage
@@ -100,6 +129,11 @@
     	}
     	
     	var _obj = getLocalDataObj(request.dataLabel);
+    	
+    	if (typeof(request.sort_type)!=undefined){
+    		_obj = sortLocalDataObj(_obj, request.sort_type);
+    	}
+    	
     	var size = $.jStorage.storageSize();
 	    sendResponse({method:request.method,data:_obj,size:toMBytes(size)});
   
