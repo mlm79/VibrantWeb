@@ -3,6 +3,7 @@
     <script type="text/javascript" src='js/jquery-1.6.4.min.js'></script>
     <script type="text/javascript" src='js/jstorage.js'></script>
     <script type="text/javascript" src='js/utils.js'></script>
+     <script type="text/javascript" src='js/site_blacklist.js'></script>
   </head>
 <script type="text/javascript">
 	
@@ -69,10 +70,12 @@
 		if (sort_type=='by_domain'){
 			for (var i in _obj.entities){
 				var entity = parseBaseDomainFromLink(_obj.entities[i].entity);
-				if (_data[entity]==null){
-					_data[entity]=0;
+				if (site_blacklist.indexOf(entity)==-1) {
+					if (_data[entity]==null){
+						_data[entity]=0;
+					}
+					_data[entity]++;
 				}
-				_data[entity]++;
 			}
 		} else {
 			_data = _obj;

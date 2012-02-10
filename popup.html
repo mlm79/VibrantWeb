@@ -81,7 +81,8 @@
 		
 		$("#clearHistory").click(function() {
 			chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
-				chrome.tabs.create({url:chrome.extension.getURL('home.html')});
+				//chrome.tabs.create({url:chrome.extension.getURL('home.html')});
+				document.reload();
 				console.log(response.method);
 				console.log(response.size);
 				console.log(response.data);
@@ -118,7 +119,7 @@
 			} else {
 				var table = viewDataAsTable(domains);
 			    $('#leaderboard').append(table);
-			    $("#myTable").tablesorter();
+			    $("#myTable").tablesorter({sortList: [[1,1]]});
 			}
 		
 		});

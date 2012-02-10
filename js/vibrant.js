@@ -7,20 +7,44 @@
 
 /* 
 	Vibrant class 
- 	Class variables: none  
+ 	Class variables: 
+ 		- Vibrant.sessionObj : array of entities collected on the site; each entity is an object 
+ 								containing 'domain','site','entity','type','timestamp'  
  	
  	Main container for tool.
 */
 
+
+/*============================ SETTING UP VW =======================================*/
+
 var Vibrant = Vibrant || {};
 
-Vibrant.sessionObj = Vibrant.sessionObj || {"websites":{},"siteEntities":{}};
+Vibrant.sessionObj = {};
 
-Vibrant.sessionOn = true;
+/* 
+	Vibrant.checkSessionState function
+	@params: none	
+	
+	Checks background.html for sessionState. If sessionOn==true, loads VW; if false, nothing happens.
+*/
 
-Vibrant.updateSession = function(state) {
-	Vibrant.sessionOn = state;
+Vibrant.checkSessionState = function() {
+	chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
+		if (response.data["sessionOn"]&&isGoodUrl()) {
+			console.log("starting");
+			window.setTimeout(Vibrant.load,1000);
+			Vibrant.startTab();
+		}
+	});
 }
+
+Vibrant.startTab = function(){
+	$('body').prepend("<div class='vb_tab' id='vb_showViz'></div>")
+	$('#vb_showViz').click(function(){
+		//sketch();	
+	})
+}
+
 
 /* 
 	Vibrant.waiting function
@@ -30,37 +54,10 @@ Vibrant.updateSession = function(state) {
 */
 
 Vibrant.waiting = function() {
-	$('body').prepend("<div id='vibrant_main'></div");
+	$('body').prepend("<div class='vb_tab' id='vibrant_main'></div");
 	$("#vibrant_main").load(chrome.extension.getURL('recap.html'),function(){
 		console.log(chrome.extension.getURL('recap.html'));
 		Vibrant.vibrateColors();
-	});
-}
-
-/* 
-	Vibrant.load function
-	@params: none	
-	
-	Kicks of mining and visualizing process.
-*/
-
-Vibrant.load = function(){
-	var http_links = Vibrant.findSiteLinks();
-	var title = "Artifacts from "+document.URL;
-	Vibrant.displayLinks(http_links,title);
-	Vibrant.loadLinks(http_links);
-}
-
-Vibrant.startSession = function() {
-	//start recording data
-	Vibrant.load();
-}
-
-Vibrant.deleteSessionData = function() {
-	//clear data cache
-	chrome.extension.sendRequest({method:"delete"}, function(response) {
-		console.log(response.method);
-		console.log(response.size);
 	});
 }
 
@@ -80,118 +77,24 @@ Vibrant.vibrateColors = function() {
 	})
 }
 
-Vibrant.loadLinks = function(_http_links) {
-	chrome.extension.sendRequest({method:"get"}, function(response) {
-		console.log(response.method);
-		Vibrant.sessionObj = response.data;
-		
-		var currentUrl = document.URL;
-		Vibrant.sessionObj["websites"][currentUrl] = _http_links;
-		
-		var _obj = Vibrant.sessionObj["siteEntities"];
-		$.each(_http_links,function(k,v){
-			for (var i=0;i<v.length;i++){
-				if (_obj.hasOwnProperty(v[i])) {
-					if (_obj[v[i]]["websites"].indexOf(currentUrl)==-1) {
-						_obj[v[i]]["websites"].push(currentUrl);
-					}
-				} else {
-					_obj[v[i]] = {"type":k,"websites":[currentUrl]};
-				}
-			}
-		})
-		chrome.extension.sendRequest({data: Vibrant.sessionObj,method:"set"}, function(response) {
-			console.log(response.method);
-			console.log(response.data);
-			console.log(response.size);
-		});
-	});		
-}
+
+
+/*============================ COLLECTING DATA =======================================*/
 
 /* 
-	Vibrant.displayLinks function
-	@params: _http_links - JSON object containing all http calls and cookies from Vibrant.findSiteLinks	
+	Vibrant.load function
+	@params: none	
 	
-	Displays 3rd-party-identified links in browser.
+	Kicks of mining and visualizing process.
 */
 
-Vibrant.displayLinks = function(_http_links,title) {
-	$("#vb_title").text(title);
-	$.each(_http_links,function(i){
-		$("#vb_"+i+"_count").text(_http_links[i].length);
-		$("#vb_list").append("<h3 id='"+i+"Header"+"'>"+i+"</h3>");
-		var links_list = '';
-		$.each(_http_links[i],function(j){
-			links_list += "<li class='vb_link'>"+_http_links[i][j]+"</li>";		
-		});
-		$("#"+i+"Header").after("<ol>"+links_list+"</ol>");
-	});
-	//Vibrant.setSearchDomainName();
-	chrome.extension.sendRequest({method:"get"}, function(response) {
-		Vibrant.sessionObj = response.data;
-		Vibrant.setCommonWebsites();
-	});
+Vibrant.load = function(){
+	var siteEntities = Vibrant.collectSiteEntities();
+	Vibrant.sessionObj = siteEntities;
+	var title = "Artifacts from "+document.URL;
+	Vibrant.storeSiteEntities(siteEntities);
 }
 
-Vibrant.setSearchDomainName = function() {	
-	$('.vb_link').each(function(){
-		var domain = parseBaseDomainFromLink($(this).text());
-		var query = "http://ajax.googleapis.com/ajax/services/search/web?start=0&rsz=large&v=1.0&q="
-		var items = "";
-		$.getJSON(query+domain,function(data){
-			$.each(data["responseData"]["results"], function(key, val) {
-				var url = val["url"];
-				var title = val["title"];
-				var blurb = val["titleNoFormatting"];
-				items += "<li><a target='_blank' href='"+url+"'>"+title+"</a></li>";
-			});		
-	  	});
-		Vibrant.displaySideBar($(this),items);		
-	});	
-}
-
-Vibrant.setCommonWebsites = function() {
-	var _obj = Vibrant.sessionObj["siteEntities"];
-	$('.vb_link').each(function(){
-		var items="";
-		var txt = $(this).text();
-		if (_obj.hasOwnProperty(txt)&&_obj[txt]['websites'].length>0) {
-		
-			//delete reference to current website
-			_obj[txt]['websites'].splice(_obj[txt]['websites'].indexOf(window.location.href),1);
-			
-			var siteArray = _obj[txt]['websites'];
-			if (siteArray.length>0)	{
-				$(this).css({"font-weight":"bold",'color':'red'});
-			}
-			$.each(siteArray,function(i) {
-				var site = siteArray[i];
-				items += "<li><a target='_blank' href='"+site+"'>"+site+"</a></li>";
-			});
-		}		
-		Vibrant.displaySideBar($(this),items);	
-	});
-}
-
-Vibrant.displaySideBar = function(_link,_items) {
-	_link.mouseover(function(){
-		$("#vb_search_list").empty();
-		if (_items!="") {
-			$("#vb_search_list").append(_items);
-			var top = $(this).offset().top;
-			var left = $(this).offset().left;
-			$("#vb_search_popup").offset({top:top,left:left-230});
-			$("#vb_search_popup").show();
-		} else {
-			$("#vb_search_popup").hide();
-		}
-	});
-	
-	_link.mouseout(function(){
-		//$("#vb_search_list").empty();
-		//$("#vb_search_popup").hide();
-	});
-}
 
 /* 
 	Vibrant.findSiteLinks function
@@ -202,8 +105,13 @@ Vibrant.displaySideBar = function(_link,_items) {
 	those with non-relative links.
 */
 
-Vibrant.findSiteLinks = function() {
-	var json_response = {"scripts":[],"frames":[],"images":[],"links":[],"cookies":[]};
+Vibrant.collectSiteEntities = function() {
+	var siteEntities = [];
+	
+	var timestamp = new Date();
+	var domain = parseBaseDomain(document.domain);
+	var site = document.URL;
+	
 	var el_types = {
 		0:{"name":"scripts","el_match":"script","attr_match":"src"},
 		1:{"name":"images","el_match":"img","attr_match":"src"},
@@ -216,8 +124,7 @@ Vibrant.findSiteLinks = function() {
 		$(el_types[i]["el_match"],document).each(function(){
 			var cleanLink = Vibrant.cleanLink($(this),el_types[i]["attr_match"]);		
 			if (cleanLink){
-				//$(this).css({'border':'5px solid red'});
-				json_response[el_types[i]["name"]].push(cleanLink);
+				siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cleanLink,"type":el_types[i]["name"]});
 			}
 		});
 	});
@@ -225,10 +132,10 @@ Vibrant.findSiteLinks = function() {
 	//Collect cookies
 	var cookies = document.cookie.split(";");
 	$.each(cookies, function(i){
-		json_response["cookies"].push(cookies[i]);
+		siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cookies[i],"type":"cookies"});
 	});
 	
-	return json_response;
+	return siteEntities;
 }
 
 /* 
@@ -250,21 +157,48 @@ Vibrant.cleanLink = function(_el,_attr) {
 	}
 }
 
-/*
-chrome.extension.onConnect.addListener(function(port) {
-	console.assert(port.name == "VibrantWeb_state");
-	port.onMessage.addListener(function(msg) {
-		console.log(msg.state);
-	});
+/* 
+	Vibrant.storeSiteEntities function
+	@params: none
 	
-	if (typeof(msg.state) != 'undefined')
-		Vibrant.updateSession(msg.state);
-	else if (typeof(msg.clearCache) != 'undefined'&&msg.clearCache==false)
-		Vibrant.deleteSessionData();
-		
-});
+	Send Vibrant.sessionObj to background.html to be added to "browsingData" storage
 */
 
-//wait to load so more cookies/http calls can be captured (e.g. beacon imgs)
-Vibrant.waiting();
-window.setTimeout(Vibrant.load,1000);
+Vibrant.storeSiteEntities = function(_siteEntities) {
+	if (_siteEntities.length>0) {
+		chrome.extension.sendRequest({data: _siteEntities,method:"set",dataLabel:"browsingData"}, function(response) {
+			console.log(response.method);
+			console.log(response.data);
+			console.log(response.size);
+		});	
+	} else {
+		console.log("No entities to store.");	
+	}
+
+}
+
+/*============================ DISPLAY DATA =======================================*/
+
+Vibrant.viewDataAsTable = function(_data) {
+	var str="<table id='myTable' class='tablesorter'><thead><tr>";
+	$.each(_data[0],function(k,v){
+		str+="<th class='"+k+"_head'>"+k+"</th>";
+	})
+	str+="</tr></thead><tbody>";
+
+	for (var i=0; i < _data.length; i++) {
+		str+="<tr>";
+		$.each(_data[i],function(k,v){
+			str+="<td class='"+k+"'>"+v+"</td>";
+		})
+		str+="</tr>";
+	}
+	str+="</tbody></table>"
+	return str;
+}
+
+
+/*============================ RUN SESSION =======================================*/
+
+Vibrant.checkSessionState();
+
