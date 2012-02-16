@@ -33,9 +33,9 @@
 		</div>
 		<div id="footer">
 			<span>Sites visited since </span>
-			<span id="since_date">1/22/12</span>
+			<span id="since_date"></span>
 			<span>: </span>
-			<span id="count_sites">213</span>
+			<span id="count_sites"></span>
 		</div>
 	
 	
@@ -53,6 +53,9 @@
 				val:false
 			}
 		}
+		
+		
+		
 	
 		chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
 			console.log(response.method);
@@ -89,20 +92,31 @@
 			});	
 		})
 		
-		$("#homepage").click(function(){
-			chrome.tabs.create({url:chrome.extension.getURL('home.html')});
+		$("#title").click(function(){
+			chrome.tabs.create({url:chrome.extension.getURL('landingpage.html')});
 			window.close();
 		})
+
 		
-		
-		function viewDataAsTable(_data) {
-			var str="<table id='myTable' class='tablesorter'><thead><tr>";
+		function viewDataAsTable(_data,tabDomain) {
+			var total_sites = Object.keys(_data.sites).length;
+			$("#count_sites").text(total_sites);			
+			$("#since_date").text(_data.oldest_timestamp.split("T")[0]+" "+_data.oldest_timestamp.split("T")[1].split(".")[0]);
 			
-			str+="<th class='domain_head'>Domain</th><th class='count_head'>Count</th>";
+			
+			var str="<table id='myTable' class='tablesorter'><thead><tr>";	
+			str+="<th class='this_th'></th><th class='domain_head'>Domain</th><th class='count_head'>Count</th><th class='count_head'>% of Sites</th>";
 			str+="</tr></thead><tbody>";
 		
-			$.each(_data,function(k,v){
-				str+="<tr><td class='domain_td'><a href='http://"+k+"'>"+k+"</a></td><td class='count_td'>"+v+"</td></tr>";
+			$.each(_data.entities,function(k,v){
+					console.log("tab",tabDomain,v.sites);
+					var highlight_td = "color_off";
+					if (v.sites.indexOf(tabDomain)!=-1){
+						highlight_td = "color_on";
+					}
+					str+="<tr><td class='"+highlight_td+"'></td><td class='domain_td'><a href='http://"+k+"'>"+k+"</a></td>"
+					+"<td class='count_td'>"+v.sites.length+"</td>"
+					+"<td class='count_td'>"+Math.round(v.sites.length/total_sites*100)+"%"+"</td></tr>";
 			})
 			str+="</tbody></table>";
 			
@@ -110,16 +124,19 @@
 		}
 		
 		chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
-			var domains = response.data;
-			console.log(domains);
-			var len = Object.keys(domains).length;
-			console.log(len);
+			var _data = response.data;
+			var len = Object.keys(_data).length;
 			if (!(len>0)) {
 				$('#leaderboard').append("<div id='noResults'>You currently have no Vibrant history.</div>");
 			} else {
-				var table = viewDataAsTable(domains);
-			    $('#leaderboard').append(table);
-			    $("#myTable").tablesorter({sortList: [[1,1]]});
+				chrome.tabs.getSelected(null,function(tab) {
+					console.log("tab url",tab.url);
+					var tabDomain = parseBaseDomainFromLink(tab.url,true);
+					var table = viewDataAsTable(_data,tabDomain);
+					$('#leaderboard').append(table);
+			    	$("#myTable").tablesorter({sortList: [[2,1]]});
+
+				});
 			}
 		
 		});

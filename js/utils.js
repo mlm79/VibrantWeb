@@ -6,10 +6,13 @@ function parseBaseDomain(domainStr) {
 }
 
 //return full domain
-function parseBaseDomainFromLink(_http_link) {
+function parseBaseDomainFromLink(_http_link,base_domain) {
 	var re = /^http:\/\/(.*?)\//; //match domain
 	 _http_link.match(re)
 	var domain =RegExp.$1;
+	if (base_domain){
+		domain = parseBaseDomain(domain);
+	}
 	return domain;
 }
 

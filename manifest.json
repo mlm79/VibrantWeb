@@ -3,13 +3,12 @@
   "version": "1.0",
   "description": "Mining and visualizing 3rd-party .",
   "permissions": [
-    "http://*/*", "https://*/*"
+    "http://*/*", "https://*/*","tabs"
   ],
   "background_page": "background.html",
   "content_scripts": [
     {
       "matches": ["http://*/*"],
-      "css": ["css/vibrant.css"],
       "js": ["js/jquery-1.6.4.min.js","js/jstorage.js","js/utils.js","js/vibrant.js"]
     }
   ],

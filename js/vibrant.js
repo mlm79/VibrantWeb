@@ -177,26 +177,6 @@ Vibrant.storeSiteEntities = function(_siteEntities) {
 
 }
 
-/*============================ DISPLAY DATA =======================================*/
-
-Vibrant.viewDataAsTable = function(_data) {
-	var str="<table id='myTable' class='tablesorter'><thead><tr>";
-	$.each(_data[0],function(k,v){
-		str+="<th class='"+k+"_head'>"+k+"</th>";
-	})
-	str+="</tr></thead><tbody>";
-
-	for (var i=0; i < _data.length; i++) {
-		str+="<tr>";
-		$.each(_data[i],function(k,v){
-			str+="<td class='"+k+"'>"+v+"</td>";
-		})
-		str+="</tr>";
-	}
-	str+="</tbody></table>"
-	return str;
-}
-
 
 /*============================ RUN SESSION =======================================*/
 

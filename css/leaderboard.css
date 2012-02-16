@@ -2,12 +2,12 @@
 html {
   	margin:0;
   	padding:0;
-  	width:245px;
+  	width:265px;
 }
 
 
 body {
-	width:220px;
+	width:240px;
   	height:200px;
   	color:#454545;
   	background:#efefef;
@@ -26,7 +26,7 @@ body {
 #main {
 	margin:10px 0px;
 	height:auto;
-	width:270px;
+	width:290px;
 	padding:5px 10px;
 	font-size: 12px;
 }
@@ -48,7 +48,6 @@ body {
 	height:auto;
 	top:10px;
 	z-index: 400;
-	display: none;
 	color:white;
 }
 
@@ -57,6 +56,11 @@ body {
 	width:140px;
 	margin-left:20px;
 	font-size: 18px;
+}
+
+#title:hover {
+	cursor: pointer;
+	color:aqua;
 }
 
 #controls {
@@ -100,18 +104,28 @@ body {
 }
 
 #leaderboard {
-	width:270px;
+	width:95%;
 	margin:auto;
 	height:180px;
 	overflow-y: scroll;
 	position: absolute;
 	top: 10px;
-	left: 15px;
+	left: 10px;
 }
 
 #leaderboard span {
 	display: inline;
 }
+
+.tablesorter .color_on {
+	background: red;
+}
+
+#count_sites {
+	font-weight: bold;
+}
+
+
 
 #footer {
 	background: rgba(0,0,0,.2);

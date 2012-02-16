@@ -55,32 +55,85 @@
     	return _data;
 	}
 	
+	
+
+	
+	//return true means entity is on blacklist
+	function checkBlacklist(domain,entity) {
+		try {
+			var blacklisted = false;
+			if (Object.keys(site_blacklist).indexOf(domain)==-1){
+				blacklisted = false;
+			} else if (site_blacklist[domain].indexOf(entity)!=-1) {
+				blacklisted = true;
+			} 
+			
+			if (site_blacklist['*'].indexOf(entity)!=-1) {
+				blacklisted = true;
+			}
+		
+		} catch (err) {
+			console.log("error",domain,entity);
+			console.log(err);
+		}
+						
+		return blacklisted;	
+	}
+	
 	/* 
 	sortLocalDataObj function
 	
-	@params: sort_type - string, sort by what
-			_obj - local data obj
+	@params: _obj - local data obj
 	
 	Return sorted object
 	
 	*/
 	
-	function sortLocalDataObj(_obj,sort_type) {
-		var _data = {};
-		if (sort_type=='by_domain'){
-			for (var i in _obj.entities){
-				var entity = parseBaseDomainFromLink(_obj.entities[i].entity);
-				if (site_blacklist.indexOf(entity)==-1) {
-					if (_data[entity]==null){
-						_data[entity]=0;
-					}
-					_data[entity]++;
+	function sortLocalDataObj(_obj) {
+		var _data = {sites:{},entities:{}},
+			sites_index = 0,
+			entities_index = 0,
+			oldest_timestamp = new Date(); 
+			
+		for (var i in _obj.entities){
+			var entity = parseBaseDomainFromLink(_obj.entities[i].entity); //rejects cookies; may want to add them back later
+			var domain = _obj.entities[i].domain;
+			oldest_timestamp = oldest_timestamp<_obj.entities[i].timestamp?oldest_timestamp:_obj.entities[i].timestamp;
+			
+			//add all domains to obj, regardless of whether they have external entities
+			if (_data.sites[domain]==null){
+				_data.sites[domain] = {};
+				_data.sites[domain].entities = [];
+			}	
+			
+			if ( !checkBlacklist(domain,entity) ) {
+			
+				//only index sites with entities
+				if (_data.sites[domain].index==null) {
+					_data.sites[domain].index = sites_index;
+					sites_index++;
 				}
+				
+				if (_data.entities[entity]==null){
+					_data.entities[entity] = {};
+					_data.entities[entity].index = entities_index;
+					_data.entities[entity].sites = [];
+					entities_index++;
+				}
+				
+				if (_data.sites[domain].entities.indexOf(entity)==-1){
+					_data.sites[domain].entities.push(entity);
+				}
+				if (_data.entities[entity].sites.indexOf(domain)==-1){
+					_data.entities[entity].sites.push(domain);
+				}
+			
+				
 			}
-		} else {
-			_data = _obj;
 		}
-		
+		console.log(_data);
+		//console.log(oldest_timestamp);
+		_data["oldest_timestamp"] = oldest_timestamp;
 		return _data;
 	}
 	
@@ -132,8 +185,10 @@
     	}
     	
     	var _obj = getLocalDataObj(request.dataLabel);
+    	console.log("orig obj",_obj);
     	
-    	if (typeof(request.sort_type)!=undefined){
+    	if (typeof(request.sort_type)!=undefined && request.sort_type=='by_domain' ){
+    		console.log("sorting");
     		_obj = sortLocalDataObj(_obj, request.sort_type);
     	}
     	
