@@ -22,17 +22,10 @@
 			</div>	
 		</div>
 		<script type="text/javascript">
-			var groups = [0,1];
-			var parents = [0,1,2];
-			var children = [0,1,2,3,4,5];
-			groups[0] = parents;
-			groups[1] = parents;
-			for (var i in groups){
-				for (var j in groups[i]){
-					groups[i][j] = children;
-				}
-			}
-			VibrantViz.interRelations($("#cnv").attr('id'),groups);
+			chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
+				VibrantViz.interRelations($("#cnv").attr('id'),response.data);
+			});
+			
 		</script>
 	</body>
 </html>
