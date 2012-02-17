@@ -55,9 +55,6 @@
     	return _data;
 	}
 	
-	
-
-	
 	//return true means entity is on blacklist
 	function checkBlacklist(domain,entity) {
 		try {
@@ -96,7 +93,11 @@
 			oldest_timestamp = new Date(); 
 			
 		for (var i in _obj.entities){
+			if (typeof _obj.entities[i].entity=='undefined'){
+				continue;
+			}
 			var entity = parseBaseDomainFromLink(_obj.entities[i].entity); //rejects cookies; may want to add them back later
+			
 			var domain = _obj.entities[i].domain;
 			oldest_timestamp = oldest_timestamp<_obj.entities[i].timestamp?oldest_timestamp:_obj.entities[i].timestamp;
 			

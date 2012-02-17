@@ -123,6 +123,8 @@
 			return str;
 		}
 		
+		console.log("starting send request");
+		
 		chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
 			var _data = response.data;
 			var len = Object.keys(_data).length;
