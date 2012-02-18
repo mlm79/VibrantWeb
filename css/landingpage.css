@@ -1,8 +1,20 @@
+html {
+	-webkit-font-smoothing: antialiased;
+
+}
+
+
 body {
 	background:white;
 	margin:0;
 	padding:0;
 	font-family:monospace;
+	font-size:12px;
+}
+
+#wrapper {
+	width:100%;
+	height:auto;
 }
 
 #header {
@@ -16,11 +28,52 @@ body {
 
 #main {
 	margin:20px;
-
+	width:100%;
 }
 
 #container {
 	background: #777;
+}
+
+/* 
+ * jQuery-UI elements 
+ *
+*/
+.ui-widget label {
+	font-family:monospace;
+	font-size:12px;
+}
+
+.ui-autocomplete {
+	max-height: 100px;
+	overflow-y: auto;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+	/* add padding to account for vertical scrollbar */
+	padding-right: 20px;
+}
+
+#controls {
+	width:600px;
+}
+
+#demo-frame > div.demo { padding: 10px !important; width:200px; height:20px;}
+#slider-range {width:300px;}
+
+#site_search {
+	float:right; 
+	margin-right:0px;
+	margin-top:20px;
+}
+
+
+
+
+#cnv {
+	border:1px solid #454545;
+	background:white;
+	margin-top:30px;
+	margin-left:30px;
 }
 
 #legend {

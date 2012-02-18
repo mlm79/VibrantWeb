@@ -6,26 +6,49 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<script type="text/javascript" src='js/jquery-1.6.4.min.js'></script>
 		<script type="text/javascript" src='js/jquery.tablesorter.min.js'></script>
-		<script type="text/javascript" src='js/processing-1.3.6.min.js'></script>
+		<script type="text/javascript" src='js/jquery-ui/js/jquery-ui-1.8.17.custom.min.js'></script>
+		<script type="text/javascript" src='js/p-1.2.3.min.js'></script>
 	    <script type="text/javascript" src='js/utils.js'></script>
 	   	<script type="text/javascript" src='js/vibrant.js'></script>
-	   		<script type="text/javascript" src='js/vibrant_visualization.js'></script>
+	   	<script type="text/javascript" src='js/vibrant_visualization.js'></script>
 	   	<link rel="stylesheet" href="css/blue/style.css" />
 	   	<link rel="stylesheet" href="css/landingpage.css" />
+	   	<link rel="stylesheet" href="js/jquery-ui/css/ui-lightness/jquery-ui-1.8.17.custom.css" />
+	   	
 	</head>
 	<body>
-	<div id='wrapper'>
+		<div id='wrapper'>
 			<div id='header'>
 			</div>
-			<div id='main'>
-				<canvas id="cnv"></canvas>
-			</div>	
-		</div>
-		<script type="text/javascript">
-			chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
-				VibrantViz.interRelations($("#cnv").attr('id'),response.data);
-			});
+			<div id="main">
+				<div id="controls" class="demo">
+					<div id="site_search" class="ui-widget">
+						<label for="tags">Search site name: </label>
+					</div>
+					<p>
+						<label for="amount">Range of entities a site has:</label>
+						<input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
+					</p>
+					<div id="slider-range"></div>
+					
+				</div>
+				
+				
+				
+				
+				<canvas width="1440" height="600" id="cnv"> 
+		    		Your browser is not supported.
+				</canvas>
 			
+			</div>
+		</div>
+		
+		<script type="text/javascript">
+			$(document).ready(function(){
+				chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
+					VibrantViz.interRelations($("#cnv").attr('id'),response.data);
+				});
+			});
 		</script>
 	</body>
 </html>
