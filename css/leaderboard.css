@@ -2,13 +2,13 @@
 html {
   	margin:0;
   	padding:0;
-  	width:265px;
+  	width:324px;
 }
 
 
 body {
-	width:240px;
-  	height:200px;
+	width:306px;
+  	height:240px;
   	color:#454545;
   	background:#efefef;
   	font-family: "moby-monospace-1", "moby-monospace-2",serif;
@@ -26,7 +26,7 @@ body {
 #main {
 	margin:10px 0px;
 	height:auto;
-	width:290px;
+	width:366px;
 	padding:5px 10px;
 	font-size: 12px;
 }
@@ -53,14 +53,16 @@ body {
 
 #title {
 	height:auto;
-	width:140px;
+	width:180px;
 	margin-left:20px;
 	font-size: 18px;
+	margin-top:10px;
+	font-family:monospace;
 }
 
 #title:hover {
 	cursor: pointer;
-	color:aqua;
+	color:#f9149b;
 }
 
 #controls {
@@ -104,13 +106,13 @@ body {
 }
 
 #leaderboard {
-	width:95%;
+	width:100%;
 	margin:auto;
-	height:180px;
+	height:228px;
 	overflow-y: scroll;
 	position: absolute;
-	top: 10px;
-	left: 10px;
+	top: 0px;
+	left: 0px;
 }
 
 #leaderboard span {
@@ -118,20 +120,39 @@ body {
 }
 
 .tablesorter .color_on {
-	background: red;
+	background: #f9149b;
 }
 
-#count_sites {
-	font-weight: bold;
+.tablesorter a, .tablesorter a:visited {
+	color: #3d3d3d;
 }
 
+.tablesorter a:hover {
+	color: rgba(19, 185, 236,1);
+}
 
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+	background-color: rgba(19, 185, 236,.4);
+}
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: rgba(19, 185, 236,.1);
+}
 
 #footer {
-	background: rgba(0,0,0,.2);
+	background: rgba(0,0,0,.6);
 	position: absolute;
 	bottom: 0;
 	left:0;
 	width:100%;
-	padding:2px 20px;
+	padding:2px 40px;
+	font-family: arial;
+	font-size: 12px;
+	color:white;
 }
+
+#count_sites {
+	font-weight: bold;
+	color:#ffd015;
+}
+

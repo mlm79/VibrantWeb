@@ -1,16 +1,19 @@
 html {
 	-webkit-font-smoothing: antialiased;
-
 }
-
 
 body {
 	background:white;
 	margin:0;
 	padding:0;
 	font-family:monospace;
-	font-size:12px;
+	font-size:14px;
 }
+
+/* Contain floats: nicolasgallagher.com/micro-clearfix-hack/ */ 
+.clearfix:before, .clearfix:after { content: ""; display: table; }
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; }
 
 #wrapper {
 	width:100%;
@@ -19,15 +22,21 @@ body {
 
 #header {
 	color:white;
-	font-size: 18px;
 	-webkit-box-shadow: rgba(0, 0, 0, 8) 0px 0px 8px;
 	background:#3e3e3e;
-	height:30px;
+	height:50px;
 	margin:0;
+	text-align: center;
+}
+
+#title {
+	color:#f9149b;
+	font-size:30px;
+	padding:5px 0px 10px 0px;
 }
 
 #main {
-	margin:20px;
+	margin:0px 20px;
 	width:100%;
 }
 
@@ -35,13 +44,32 @@ body {
 	background: #777;
 }
 
+#controls {
+	width:1550px;
+	height:auto;
+	margin-left:20px;
+}
+
+#demo-frame > div.demo { padding: 0px 10px 10px 10px !important; width:200px; height:20px;}
+#slider-range,#entity-range {width:300px;}
+
+.ranges {
+	margin-left:20px;
+}
+
+#site_search {
+	float:right; 
+	margin-right:0px;
+	margin-top:20px;
+}
+
+
 /* 
  * jQuery-UI elements 
  *
 */
 .ui-widget label {
 	font-family:monospace;
-	font-size:12px;
 }
 
 .ui-autocomplete {
@@ -53,18 +81,18 @@ body {
 	padding-right: 20px;
 }
 
-#controls {
-	width:600px;
+.ui-widget-header {
+	background-color: rgba(19, 185, 236,1);
+	background-url:none;
 }
 
-#demo-frame > div.demo { padding: 10px !important; width:200px; height:20px;}
-#slider-range {width:300px;}
-
-#site_search {
-	float:right; 
-	margin-right:0px;
-	margin-top:20px;
+.ranges input {
+	color: rgba(19, 185, 236,1);
 }
+
+/**/
+
+
 
 
 

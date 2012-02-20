@@ -105,7 +105,7 @@
 			
 			
 			var str="<table id='myTable' class='tablesorter'><thead><tr>";	
-			str+="<th class='this_th'></th><th class='domain_head'>Domain</th><th class='count_head'>Count</th><th class='count_head'>% of Sites</th>";
+			str+="<th class='this_th'></th><th class='domain_head'>Domain</th><th class='count_head'>Count</th><th class='count_head'>Sites</th>";
 			str+="</tr></thead><tbody>";
 		
 			$.each(_data.entities,function(k,v){
@@ -114,9 +114,9 @@
 					if (v.sites.indexOf(tabDomain)!=-1){
 						highlight_td = "color_on";
 					}
-					str+="<tr><td class='"+highlight_td+"'></td><td class='domain_td'><a href='http://"+k+"'>"+k+"</a></td>"
-					+"<td class='count_td'>"+v.sites.length+"</td>"
-					+"<td class='count_td'>"+Math.round(v.sites.length/total_sites*100)+"%"+"</td></tr>";
+					str+="<tr><td width='15' class='"+highlight_td+"'></td><td class='domain_td'><a target='_blank' href='http://"+k+"'>"+k+"</a></td>"
+					+"<td align='center' width='45' class='count_td'>"+v.sites.length+"</td>"
+					+"<td align='center' width='45' class='count_td'>"+Math.round(v.sites.length/total_sites*100)+"%"+"</td></tr>";
 			})
 			str+="</tbody></table>";
 			

@@ -19,53 +19,77 @@ VibrantViz.interRelations = function(canvas_id,_data){
 	var rectHeight = 30;
 	var site_length;
 	
-	var filter_min;
-	var filter_max;
-	var range_min = 500;
-	var range_max = 0;
+	var site_filter_min;
+	var site_filter_max;
+	var site_range_min = 500;
+	var site_range_max = 0;
+	var entity_filter_min;
+	var entity_filter_max;
+	var entity_range_min = 500;
+	var entity_range_max = 0;
 	var site_names = [];
-		
+	var entity_names = [];
+	
+
 	for (var i in _data.sites) {
-		if (typeof(_data.sites[i].index)!=undefined) {
-			if (_data.sites[i].entities.length<range_min) {range_min = _data.sites[i].entities.length}
-			if(_data.sites[i].entities.length>range_max) {range_max = _data.sites[i].entities.length}
+		if (_data.sites[i].index!=null) {
+			if (_data.sites[i].entities.length<site_range_min) {site_range_min = _data.sites[i].entities.length}
+			if(_data.sites[i].entities.length>site_range_max) {site_range_max = _data.sites[i].entities.length}
 			site_names.push(i);
 			site_length++;
 		} else {
 			delete _data.sites[i];
 		}
-		filter_min = range_min;
-		filter_max = range_max;
-		site_names.sort();
-		console.log("site names",site_names);
+		site_filter_min = site_range_min;
+		site_filter_max = site_range_max;
 	}
 	
-	//$(function() {
-	function setControls(){
+	for (var i in _data.entities) {
+		if (_data.entities[i].sites.length<entity_range_min) {entity_range_min = _data.entities[i].sites.length}
+		if(_data.entities[i].sites.length>entity_range_max) {entity_range_max = _data.entities[i].sites.length}
+		entity_names.push(i);
+		entity_filter_min = entity_range_min;
+		entity_filter_max = entity_range_max;
+	}
+	
+	
+	
+	
+	$(function() {
 		$("#site_search").append('<input id="tags" />');
 		$( "#tags" ).autocomplete({
 			source: site_names
 		});
 		
+		$( "#entity-range" ).slider({
+			range: true,
+			min: entity_range_min,
+			max: entity_range_max,
+			values: [ entity_filter_min, entity_filter_max ],
+			slide: function( event, ui ) {
+				$( "#entity_amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+				entity_filter_min = ui.values[0];
+				entity_filter_max = ui.values[1];
+			}
+		});
+		$( "#entity_amount" ).val( $( "#entity-range" ).slider( "values", 0 ) +
+			" - " + $( "#entity-range" ).slider( "values", 1 ) );
 		
 	
 		$( "#slider-range" ).slider({
 			range: true,
-			min: range_min,
-			max: range_max,
-			values: [ filter_min, filter_max ],
+			min: site_range_min,
+			max: site_range_max,
+			values: [ site_filter_min, site_filter_max ],
 			slide: function( event, ui ) {
 				$( "#amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
-				filter_min = ui.values[0];
-				filter_max = ui.values[1];
+				site_filter_min = ui.values[0];
+				site_filter_max = ui.values[1];
 			}
 		});
 		$( "#amount" ).val( $( "#slider-range" ).slider( "values", 0 ) +
-			" - " + $( "#slider-range" ).slider( "values", 1 ) );
-	}
-	
-	setControls();
-	//});
+			" - " + $( "#slider-range" ).slider( "values", 1 ) );	
+	});
 	
 			
 	function DataObject(){}
@@ -89,10 +113,14 @@ VibrantViz.interRelations = function(canvas_id,_data){
 			
 		if (typeof DataObject[constr].prototype.self!=='function'){
 			DataObject[constr].prototype = new DataObject();
-			//console.log('constr',type);
+		}
+		
+		if (typeof this[constr][id]!='undefined'){
+			return this[constr][id];
 		}
 		
 		newObj = new DataObject[constr](id);
+		this[constr][id] = newObj;
 		return newObj;	
 	};
 	
@@ -110,6 +138,11 @@ VibrantViz.interRelations = function(canvas_id,_data){
 		this.y = yIndent + rectHeight + ySeparation;
 	};
 	
+	
+	function sortByChildren(a,b){
+		return a.children.length - b.children.length
+	}
+	
 	var data_objects = function(){
 		if (this.obj!=null) {
 			return this.obj;
@@ -121,15 +154,17 @@ VibrantViz.interRelations = function(canvas_id,_data){
 				newObj[i].push(obj);
 			}
 		}
+		
+		newObj.sites.sort(sortByChildren);
+		newObj.entities.sort(sortByChildren);
+		
 		this.obj = newObj;
-		//console.log(newObj);
 		return newObj;
 	};
 	
-	function filterDataObjects(type,min,max) {
+	function filterDataObjects(type,min,max,min2,max2) {
 		var d = _d = data_objects();
 		var new_data = {'sites':[],'entities':[]};
-		//console.log("min",min,"max",max);
 		if (type=='sites'){
 			other = 'entities';
 		} else {
@@ -139,13 +174,27 @@ VibrantViz.interRelations = function(canvas_id,_data){
 			if (_d[type][i].children.length>=min & _d[type][i].children.length<=max) {
 				var obj = DataObject.builder(type,_d[type][i].id);
 				new_data[type].push(obj);
+				
+				if (obj.id==$("#tags").val()){
+					new_data[type] = [obj];
+					new_data[other] = [];	
+				}
+				
 				for (var j=0;j<_d[type][i].children.length;j++){
 					var childObj = DataObject.builder(other,_d[type][i].children[j]);
-					if (new_data[other].indexOf(childObj)==-1) {new_data[other].push(childObj)}
+					if (new_data[other].indexOf(childObj)==-1 & childObj.children.length>=min2 & childObj.children.length<=max2) {
+						new_data[other].push(childObj);
+					}
 				}
+				//console.log("tags",$("#tags").val());
+
+				if (obj.id==$("#tags").val()){
+					console.log("tags",$("#tags").val());
+					return new_data;	
+				}
+				
 			}
 		}
-		//console.log("filtered data obj array",new_data);
 		return new_data;
 	}
 
@@ -156,8 +205,8 @@ VibrantViz.interRelations = function(canvas_id,_data){
 	var w = $("#"+canvas_id).width();
 	var h = $("#"+canvas_id).height();
 	var canvasDims = {
-		w:1300,
-		h:600
+		w:1550,
+		h:700
 	}
 	
 	
@@ -201,11 +250,16 @@ VibrantViz.interRelations = function(canvas_id,_data){
 			col1 = [220,220,220];
 			col2 = [20,20,20];
 		} else {
-			col1 = [243, 132, 0];
-			col2 = [1, 0, 194];
+			col1 = [197, 255, 21];
+			col2 = [249, 20, 155];
 		}		
-		for (var i =0;i<len;i++){
-			var new_col = lerpColor(p,col1,col2,i/len);
+		
+		if (len==1) {
+			return [col2];
+		}
+		
+		for (var i=0;i<len;i++){
+			var new_col = lerpColor(p,col1,col2,i/(len-1));
 			colors.push(new_col);
 		}
 		return colors;
@@ -229,7 +283,7 @@ VibrantViz.interRelations = function(canvas_id,_data){
 		p.draw = function() {
 			//console.log("objs unfiltered",objs.sites.length);
 
-			objs = filterDataObjects('sites',filter_min,filter_max);
+			objs = filterDataObjects('sites',site_filter_min,site_filter_max,entity_filter_min,entity_filter_max);
 			siteColors = getColors(p,objs.sites.length,"color");
 			entityColors = getColors(p,objs.entities.length,"gray");
 			//console.log("objs filtered",objs.sites.length);
@@ -242,16 +296,19 @@ VibrantViz.interRelations = function(canvas_id,_data){
 				p.fill(col[0],col[1],col[2]);
 				var x = xIndent+i*rectWidth;
 				var y = yIndent;
+				p.noStroke();
 				p.rect(x,y,rectWidth,rectHeight);
 				p.pushMatrix();
 					p.fill(0);
+					p.textSize(12);
 					p.translate(x+5,y-5);
 					p.rotate(p.PI/-3.5);
 					p.text(site.id,0,0);
 					//console.log(site.id);
 				p.popMatrix();
 				p.fill(255);
-				p.text(site.children.length,x+5,y+15);
+				p.textSize(14);
+				p.text(site.children.length,x+5,y+20);
 				p.pushMatrix();
 					p.smooth();
 					p.strokeWeight(.5);
@@ -274,7 +331,8 @@ VibrantViz.interRelations = function(canvas_id,_data){
 				p.rect(x,y,rectWidth,rectHeight);
 				p.pushMatrix();
 					p.fill(0);
-					p.translate(x+5,y+5+rectHeight);
+					p.textSize(12);
+					p.translate(x+2,y+5+rectHeight);
 					p.rotate(p.PI/3.5);
 					p.text(entity.id,0,0);
 				p.popMatrix();

@@ -19,24 +19,33 @@
 	<body>
 		<div id='wrapper'>
 			<div id='header'>
+				<div id="title">The Vibrant Web</div>
 			</div>
 			<div id="main">
-				<div id="controls" class="demo">
+				<div id="controls" class="clearfix demo">
 					<div id="site_search" class="ui-widget">
 						<label for="tags">Search site name: </label>
 					</div>
-					<p>
-						<label for="amount">Range of entities a site has:</label>
-						<input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
-					</p>
-					<div id="slider-range"></div>
-					
+					<div class='ranges'>
+						<p>
+							<label for="amount">Range of entities a site has:</label>
+							<input type="text" id="amount" style="border:0; font-weight:bold;" />
+						</p>
+						<div id="slider-range"></div>
+					</div>
+					<div class='ranges'>
+						<p>
+							<label for="entity_amount">Range of sites an entity is on:</label>
+							<input type="text" id="entity_amount" style="border:0; font-weight:bold;" />
+						</p>
+						<div id="entity-range"></div>
+					</div>
 				</div>
 				
 				
 				
 				
-				<canvas width="1440" height="600" id="cnv"> 
+				<canvas width="1550" height="700" id="cnv"> 
 		    		Your browser is not supported.
 				</canvas>
 			
