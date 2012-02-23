@@ -143,6 +143,11 @@ VibrantViz.interRelations = function(canvas_id,_data){
 		return a.children.length - b.children.length
 	}
 	
+	function reverseSortByChildren(a,b){
+		return b.children.length - a.children.length
+	}
+	
+	
 	var data_objects = function(){
 		if (this.obj!=null) {
 			return this.obj;
@@ -192,9 +197,10 @@ VibrantViz.interRelations = function(canvas_id,_data){
 					console.log("tags",$("#tags").val());
 					return new_data;	
 				}
-				
 			}
 		}
+		new_data.sites.sort(sortByChildren);
+		new_data.entities.sort(reverseSortByChildren)
 		return new_data;
 	}
 
@@ -205,8 +211,8 @@ VibrantViz.interRelations = function(canvas_id,_data){
 	var w = $("#"+canvas_id).width();
 	var h = $("#"+canvas_id).height();
 	var canvasDims = {
-		w:1550,
-		h:700
+		w:w,
+		h:h
 	}
 	
 	
@@ -304,7 +310,6 @@ VibrantViz.interRelations = function(canvas_id,_data){
 					p.translate(x+5,y-5);
 					p.rotate(p.PI/-3.5);
 					p.text(site.id,0,0);
-					//console.log(site.id);
 				p.popMatrix();
 				p.fill(255);
 				p.textSize(14);

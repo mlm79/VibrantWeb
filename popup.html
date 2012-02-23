@@ -84,11 +84,7 @@
 		
 		$("#clearHistory").click(function() {
 			chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
-				//chrome.tabs.create({url:chrome.extension.getURL('home.html')});
-				document.reload();
-				console.log(response.method);
-				console.log(response.size);
-				console.log(response.data);
+				$("#myTable > tbody").remove();
 			});	
 		})
 		
@@ -111,10 +107,12 @@
 			$.each(_data.entities,function(k,v){
 					console.log("tab",tabDomain,v.sites);
 					var highlight_td = "color_off";
+					var highlight_on = 0;
 					if (v.sites.indexOf(tabDomain)!=-1){
 						highlight_td = "color_on";
+						highlight_on = 1;
 					}
-					str+="<tr><td width='15' class='"+highlight_td+"'></td><td class='domain_td'><a target='_blank' href='http://"+k+"'>"+k+"</a></td>"
+					str+="<tr><td width='15' class='"+highlight_td+"'>"+highlight_on+"</td><td class='domain_td'><a target='_blank' href='http://"+k+"'>"+k+"</a></td>"
 					+"<td align='center' width='45' class='count_td'>"+v.sites.length+"</td>"
 					+"<td align='center' width='45' class='count_td'>"+Math.round(v.sites.length/total_sites*100)+"%"+"</td></tr>";
 			})

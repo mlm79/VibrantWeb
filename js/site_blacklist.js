@@ -1,4 +1,7 @@
 var site_blacklist = {
+	'fastcodesign.com' : [
+		"www.fastcompany.com"
+	],
 	'nytimes.com' : [
 		"www.nytco.com",
 		"js.nyt.com"

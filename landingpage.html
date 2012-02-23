@@ -45,7 +45,7 @@
 				
 				
 				
-				<canvas width="1550" height="700" id="cnv"> 
+				<canvas id="cnv"> 
 		    		Your browser is not supported.
 				</canvas>
 			
@@ -53,11 +53,23 @@
 		</div>
 		
 		<script type="text/javascript">
+			function resize() {
+				var w = $(window).width() - 60;
+				var h = $(window).height() - $("#header").outerHeight() - $("#controls").outerHeight() - 100;
+				
+				$('#cnv').attr('width',w);
+				$('#cnv').attr('height',h);
+				$('#controls').css({'width':w+'px'});
+			}
+		
 			$(document).ready(function(){
+				resize();
+				
 				chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
 					VibrantViz.interRelations($("#cnv").attr('id'),response.data);
 				});
 			});
+
 		</script>
 	</body>
 </html>

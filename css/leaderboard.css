@@ -119,8 +119,13 @@ body {
 	display: inline;
 }
 
-.tablesorter .color_on {
+.tablesorter tbody .color_on {
 	background: #f9149b;
+	color: #f9149b;
+}
+
+.tablesorter tbody .color_off {
+	color: white;
 }
 
 .tablesorter a, .tablesorter a:visited {
