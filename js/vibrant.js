@@ -31,52 +31,10 @@ Vibrant.sessionObj = {};
 Vibrant.checkSessionState = function() {
 	chrome.extension.sendRequest({method:"get",dataLabel:"sessionState"}, function(response) {
 		if (response.data["sessionOn"]&&isGoodUrl()) {
-			console.log("starting");
 			window.setTimeout(Vibrant.load,1000);
-			Vibrant.startTab();
 		}
 	});
 }
-
-Vibrant.startTab = function(){
-	$('body').prepend("<div class='vb_tab' id='vb_showViz'></div>")
-	$('#vb_showViz').click(function(){
-		//sketch();	
-	})
-}
-
-
-/* 
-	Vibrant.waiting function
-	@params: none	
-	
-	Called before Vibrant.load; inserts HTML template into current window.
-*/
-
-Vibrant.waiting = function() {
-	$('body').prepend("<div class='vb_tab' id='vibrant_main'></div");
-	$("#vibrant_main").load(chrome.extension.getURL('recap.html'),function(){
-		console.log(chrome.extension.getURL('recap.html'));
-		Vibrant.vibrateColors();
-	});
-}
-
-/* 
-	Vibrant.vibrateColors function
-	@params: none	
-	
-	Fades counter circles in and out while waiting for Vibrant.load to be called.
-*/
-
-Vibrant.vibrateColors = function() {
-	$(".vb_badge").each(function(){
-		$(this).animate({opacity:.1},5000);		
-	})
-	$(".vb_badge").each(function(){
-		$(this).animate({opacity:1},5000);		
-	})
-}
-
 
 
 /*============================ COLLECTING DATA =======================================*/
@@ -91,7 +49,7 @@ Vibrant.vibrateColors = function() {
 Vibrant.load = function(){
 	var siteEntities = Vibrant.collectSiteEntities();
 	Vibrant.sessionObj = siteEntities;
-	var title = "Artifacts from "+document.URL;
+	//var title = "Artifacts from "+document.URL;
 	Vibrant.storeSiteEntities(siteEntities);
 }
 
@@ -143,14 +101,15 @@ Vibrant.collectSiteEntities = function() {
 	@params: _el - element type, matched element from Vibrant.findSiteLinks	
 			 _attr - element attribute to be extracted, e.g. 'src'
 	
-	Finds relevant element attribute value that is a) not from the window's domain, and b) is an http request.
+	Finds relevant element attribute value that is a) not from the window's domain, b) is an http request, and c) is not an embedded text link.
 */
 
 Vibrant.cleanLink = function(_el,_attr) {
 	var domain = parseBaseDomain(document.domain);
 	var re = new RegExp(domain);
 	var badRe = new RegExp(badMatches());
-	if (_el.attr(_attr)&&_el.attr(_attr).indexOf('http')!=-1&&!(_el.attr(_attr).match(re))&&!(_el.attr(_attr).match(badRe))){
+	var textLink = _el.get(0).tagName=='A' && _el.text().length>0 ? true : false;
+	if (_el.attr(_attr)&&_el.attr(_attr).indexOf('http')!=-1&&!(_el.attr(_attr).match(re))&&!(_el.attr(_attr).match(badRe))&&(!textLink)){
 		return(_el.attr(_attr));
 	} else {
 		return false;

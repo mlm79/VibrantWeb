@@ -8,7 +8,8 @@ var site_blacklist = {
 	],
 	'yahoo.com' : [
 		"l.yimg.com",
-		"mail.yimg.com"	
+		"mail.yimg.com",
+		"yui.yahooapis.com"	
 	],
 	'*' : [
 		"maps.google.com",

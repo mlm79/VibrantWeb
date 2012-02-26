@@ -2,13 +2,13 @@
 html {
   	margin:0;
   	padding:0;
-  	width:324px;
+  	width:354px;
 }
 
 
 body {
-	width:306px;
-  	height:240px;
+	width:336px;
+  	height:270px;
   	color:#454545;
   	background:#efefef;
   	font-family: "moby-monospace-1", "moby-monospace-2",serif;
@@ -26,7 +26,7 @@ body {
 #main {
 	margin:10px 0px;
 	height:auto;
-	width:366px;
+	width:396px;
 	padding:5px 10px;
 	font-size: 12px;
 }
@@ -53,7 +53,7 @@ body {
 
 #title {
 	height:auto;
-	width:180px;
+	width:210px;
 	margin-left:20px;
 	font-size: 18px;
 	margin-top:10px;
@@ -108,7 +108,7 @@ body {
 #leaderboard {
 	width:100%;
 	margin:auto;
-	height:228px;
+	height:258px;
 	overflow-y: scroll;
 	position: absolute;
 	top: 0px;

@@ -107,14 +107,15 @@
 			$.each(_data.entities,function(k,v){
 					console.log("tab",tabDomain,v.sites);
 					var highlight_td = "color_off";
-					var highlight_on = 0;
+					var highlight_on = 1;
 					if (v.sites.indexOf(tabDomain)!=-1){
 						highlight_td = "color_on";
-						highlight_on = 1;
+						highlight_on = 0;
 					}
-					str+="<tr><td width='15' class='"+highlight_td+"'>"+highlight_on+"</td><td class='domain_td'><a target='_blank' href='http://"+k+"'>"+k+"</a></td>"
-					+"<td align='center' width='45' class='count_td'>"+v.sites.length+"</td>"
-					+"<td align='center' width='45' class='count_td'>"+Math.round(v.sites.length/total_sites*100)+"%"+"</td></tr>";
+					str+="<tr><td width='15' class='"+highlight_td+"'>"+highlight_on+"</td>"
+					+"<td class='domain_td'><a target='_blank' href='http://www.whois.net/whois/"+parseBaseDomain(k)+"'>"+k+"</a></td>"
+					+"<td align='center' width='48' class='count_td'>"+v.sites.length+"</td>"
+					+"<td align='center' width='48' class='count_td'>"+Math.round(v.sites.length/total_sites*100)+"%"+"</td></tr>";
 			})
 			str+="</tbody></table>";
 			
@@ -134,7 +135,7 @@
 					var tabDomain = parseBaseDomainFromLink(tab.url,true);
 					var table = viewDataAsTable(_data,tabDomain);
 					$('#leaderboard').append(table);
-			    	$("#myTable").tablesorter({sortList: [[2,1]]});
+			    	$("#myTable").tablesorter({sortList: [[2,1]] });
 
 				});
 			}
