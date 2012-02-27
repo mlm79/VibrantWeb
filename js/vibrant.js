@@ -88,18 +88,7 @@ Vibrant.collectSiteEntities = function() {
 		});
 	});
 	
-	//Removing cookie collection from vibrant.js and adding it to background.html
-	
-	//Collect cookies
-	/*
-	var cookies = document.cookie.split(";");
-	console.log(document.cookie.domain);
-	$.each(cookies, function(i){
-		var cookie = JSON.stringify(cookies[i]);
-		console.log(cookie);
-		siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cookie,"type":"cookies"});
-	});
-	*/
+	//Removed cookie collection from vibrant.js and added it to background.html to capture set/get
 
 	return siteEntities;
 
