@@ -4,7 +4,6 @@ A Chrome plug-in for mining and visualizing 3rd-party entities on the web.
 
 ### How it works
 From the downloads page, download the crx file, and open it in Chrome.
-
 After installation, click the pink VW icon in your browser bar, and in the resulting popup, click the "ON" button.
 
 ### Privacy
