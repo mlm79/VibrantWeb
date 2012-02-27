@@ -28,23 +28,41 @@
 					</div>
 					<div class='ranges'>
 						<p>
-							<label for="amount">Range of entities a site has:</label>
+							<label for="amount">3rd-party entities:</label>
 							<input type="text" id="amount" style="border:0; font-weight:bold;" />
 						</p>
 						<div id="slider-range"></div>
 					</div>
 					<div class='ranges'>
 						<p>
-							<label for="entity_amount">Range of sites an entity is on:</label>
+							<label for="entity_amount">Sites:</label>
 							<input type="text" id="entity_amount" style="border:0; font-weight:bold;" />
 						</p>
 						<div id="entity-range"></div>
 					</div>
 				</div>
-				
-				
-				
-				
+				<!--<a onclick="$( '#cnv' ).hide( 'clip',{direction:'horizontal'}, 1000,function(){ $( '#cnv' ).show( 'clip',{direction:'horizontal'}, 1000)});">Click Me</a>-->
+				<!--
+				<div class="demo">
+					<div class="form">
+						<form>
+							<div id="radio">
+								<input type="radio" id="entities" name="entities" checked="checked" /><label for="entities">Scripts, Links & Images</label>
+								<input type="radio" id="cookies" name="cookies" /><label for="cookies">Cookies</label>
+								<input type="radio" id="about" name="about" /><label for="about">About</label>
+							</div>
+						</form>
+					</div>
+				</div>
+				<script>
+					$(function() {
+						$( "#radio" ).buttonset();
+						$("#cookies").click(function(){
+							  $(this).button( "refresh" )
+						})
+					});
+				</script>
+				-->
 				<canvas id="cnv"> 
 		    		Your browser is not supported.
 				</canvas>
@@ -53,18 +71,20 @@
 		</div>
 		
 		<script type="text/javascript">
-			function resize() {
-				var w = $(window).width() - 60;
-				var h = $(window).height() - $("#header").outerHeight() - $("#controls").outerHeight() - 100;
-				
-				$('#cnv').attr('width',w);
-				$('#cnv').attr('height',h);
-				$('#controls').css({'width':w+'px'});
-			}
+			
 		
 			$(document).ready(function(){
+				function resize() {
+					var w = $(window).width() - 60;
+					var h = $(window).height() - $("#header").outerHeight() - $("#controls").outerHeight() - 100;
+					console.log(new Date(),w,h);
+					$('#cnv').attr('width',w);
+					$('#cnv').attr('height',h);
+					$('#controls').css({'width':w+'px'});
+				}
+			
 				resize();
-				
+
 				chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
 					VibrantViz.interRelations($("#cnv").attr('id'),response.data);
 				});

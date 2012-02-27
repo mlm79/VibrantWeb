@@ -94,10 +94,6 @@ VibrantViz.interRelations = function(canvas_id,_data){
 			
 	function DataObject(){}
 	
-	DataObject.prototype.resize = function(){
-		//
-	};
-	
 	DataObject.prototype.id = function(){
 		return this.id;
 	};
@@ -126,6 +122,7 @@ VibrantViz.interRelations = function(canvas_id,_data){
 	
 	DataObject.sites = function(id) {
 		this.id = id;
+		//this.children = {'entities': _data.sites[id].entities, 'cookies': _data.sites[id].cookies};
 		this.children = _data.sites[id].entities;
 		this.index = _data.sites[id].index;
 		this.y = yIndent; 
@@ -138,6 +135,12 @@ VibrantViz.interRelations = function(canvas_id,_data){
 		this.y = yIndent + rectHeight + ySeparation;
 	};
 	
+	DataObject.cookies = function(id) {
+		this.id = id;
+		this.children = _data.cookies[id].sites;
+		this.index = _data.cookies[id].index;
+		this.y = yIndent + rectHeight + ySeparation;
+	};
 	
 	function sortByChildren(a,b){
 		return a.children.length - b.children.length
@@ -152,6 +155,7 @@ VibrantViz.interRelations = function(canvas_id,_data){
 		if (this.obj!=null) {
 			return this.obj;
 		}
+		//var newObj = {'sites':[],'entities':[],'cookies':[]};
 		var newObj = {'sites':[],'entities':[]};
 		for (var i in newObj) {
 			for (var j in _data[i]) {
@@ -162,19 +166,16 @@ VibrantViz.interRelations = function(canvas_id,_data){
 		
 		newObj.sites.sort(sortByChildren);
 		newObj.entities.sort(sortByChildren);
+		//newObj.cookies.sort(sortByChildren);
 		
 		this.obj = newObj;
 		return newObj;
 	};
 	
-	function filterDataObjects(type,min,max,min2,max2) {
+	function filterDataObjects(type,other,min,max,min2,max2) {
 		var d = _d = data_objects();
+		//var new_data = {'sites':[],'entities':[],'cookies':[]};
 		var new_data = {'sites':[],'entities':[]};
-		if (type=='sites'){
-			other = 'entities';
-		} else {
-			other = 'sites';
-		}
 		for (var i=0; i < _d[type].length;i++){
 			if (_d[type][i].children.length>=min & _d[type][i].children.length<=max) {
 				var obj = DataObject.builder(type,_d[type][i].id);
@@ -191,16 +192,17 @@ VibrantViz.interRelations = function(canvas_id,_data){
 						new_data[other].push(childObj);
 					}
 				}
-				//console.log("tags",$("#tags").val());
 
 				if (obj.id==$("#tags").val()){
-					console.log("tags",$("#tags").val());
+					new_data[type].sort(sortByChildren);
+					new_data[other].sort(reverseSortByChildren)
 					return new_data;	
 				}
 			}
 		}
-		new_data.sites.sort(sortByChildren);
-		new_data.entities.sort(reverseSortByChildren)
+		//console.log("filtered");
+		new_data[type].sort(sortByChildren);
+		new_data[other].sort(reverseSortByChildren);
 		return new_data;
 	}
 
@@ -228,25 +230,13 @@ VibrantViz.interRelations = function(canvas_id,_data){
 			}
 		}
 	}
-	
-	function checkMouseHover(p,x,y,type){
-		if (p.mouseX>x & p.mouseX < x+rectWidth & p.mouseY>yIndent & p.mouseY<yIndent+site_length*rectHeight){
-			//console.log("fist pass");
-			if (p.mouseY>y & p.mouseY<y+rectHeight) {
-				//console.log("second pass");
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
+
 	function lerpColor(p, c1, c2, amt ){ 
-      var r = p.lerp(c1[0], c2[0], amt); 
-      var g = p.lerp(c1[1], c2[1], amt); 
-      var b = p.lerp(c1[2], c2[2], amt); 
-      color = [r,g,b];
-      return color; 
+    	var r = p.lerp(c1[0], c2[0], amt); 
+	      var g = p.lerp(c1[1], c2[1], amt); 
+	      var b = p.lerp(c1[2], c2[2], amt); 
+	      color = [r,g,b];
+	      return color; 
 	} 
 	
 	
@@ -276,7 +266,7 @@ VibrantViz.interRelations = function(canvas_id,_data){
 	
 	var canvas = document.getElementById(canvas_id);
 	var p = new Processing(canvas, function(p,c){	
-	//function sketch( p ) {
+
 		p.setup = function(){
 			p.size(canvasDims.w,canvasDims.h);
 			p.smooth();
@@ -286,13 +276,14 @@ VibrantViz.interRelations = function(canvas_id,_data){
 			entityColors = getColors(p,objs.entities.length,"gray");
 			ySeparation = p.height-rectHeight*2-yIndent*2;
 		},
+		
 		p.draw = function() {
-			//console.log("objs unfiltered",objs.sites.length);
-
-			objs = filterDataObjects('sites',site_filter_min,site_filter_max,entity_filter_min,entity_filter_max);
+			var site_junk = 'entities';
+			objs = filterDataObjects('sites',site_junk,site_filter_min,site_filter_max,entity_filter_min,entity_filter_max);
+			
 			siteColors = getColors(p,objs.sites.length,"color");
-			entityColors = getColors(p,objs.entities.length,"gray");
-			//console.log("objs filtered",objs.sites.length);
+			entityColors = getColors(p,objs[site_junk].length,"gray");
+
 			p.background(255);
 			rectWidth = (p.width-xIndent*2)/objs.sites.length;
 			p.noStroke();
@@ -318,17 +309,13 @@ VibrantViz.interRelations = function(canvas_id,_data){
 					p.smooth();
 					p.strokeWeight(.5);
 					drawLines(site,x,y+rectHeight,col,objs.entities);
-				p.popMatrix();
-				//if (checkMouseHover(p,x,y,'sites')) {
-					//drawLines(i,x,y,col);
-				//}				
+				p.popMatrix();			
 			}
 			
 			rectWidth = (p.width-xIndent*2)/objs.entities.length;
-			//console.log(entityColors.length,objs.entities.length);
 			p.noStroke();
-			for (var i =0; i < objs.entities.length;i++) {
-				var entity = objs.entities[i];
+			for (var i =0; i < objs[site_junk].length;i++) {
+				var entity = objs[site_junk][i];
 				var col = entityColors[i];
 				p.fill(col[0],col[1],col[2]);
 				var x = xIndent+i*rectWidth;
@@ -341,6 +328,9 @@ VibrantViz.interRelations = function(canvas_id,_data){
 					p.rotate(p.PI/3.5);
 					p.text(entity.id,0,0);
 				p.popMatrix();
+				p.fill(249, 20, 15);
+				p.textSize(14);
+				p.text(entity.children.length,x+5,y+20);
 			}
 			
 			//p.noLoop();	

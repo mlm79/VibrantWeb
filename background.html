@@ -6,7 +6,26 @@
      <script type="text/javascript" src='js/site_blacklist.js'></script>
   </head>
 <script type="text/javascript">
-	
+
+	chrome.cookies.onChanged.addListener(function(info) {
+		chrome.tabs.getSelected(null,function(tab) {
+			
+			var tabDomain = parseBaseDomainFromLink(tab.url,true);	
+			if (info.removed==false && tabDomain!=parseBaseDomain(info.cookie.domain)) {
+				console.log(tabDomain,info.cookie.domain,info.cookie);
+			}
+			
+			/*
+			var cookieDomain = parseBaseDomain(info.cookie.domain);
+			if (tabDomain!="undefined."&&info.removed==false&&tabDomain!=cookieDomain) {
+				var timestamp = new Date();
+				var cookie = [{"timestamp":timestamp,"domain":tabDomain,"site":tab.url,"entity":cookieDomain,"type":"cookies"}];
+				setLocalDataObj("browsingData",cookie);
+			}
+			*/
+		});
+	});
+
 	/* 
 	getDataShell function
 	
@@ -55,7 +74,19 @@
     	return _data;
 	}
 	
-	//return true means entity is on blacklist
+	/* 
+	checkBlacklist function
+	
+	@params: domain - string, name of domain from which entity came
+			 entity - string, url of entity came
+			 
+	Check sites_blacklist.js to see if entity should be ignored.
+	This is predominantly for entities that are owned by the current domain,
+	but whose domain is different. e.g. nytco.com is owned by nytimes.com
+	and therefore not considered a 3rd-party entity.
+	
+	*/
+	
 	function checkBlacklist(domain,entity) {
 		try {
 			var blacklisted = false;
@@ -86,10 +117,11 @@
 	
 	*/
 	
-	function sortLocalDataObj(_obj) {
-		var _data = {sites:{},entities:{}},
+	function sortLocalDataObj(_obj) {	
+		var _data = {sites:{},entities:{},cookies:{}},
 			sites_index = 0,
 			entities_index = 0,
+			cookies_index = 0,
 			oldest_timestamp = new Date(); 
 			
 		for (var i in _obj.entities){
@@ -98,6 +130,11 @@
 			}
 			var entity = parseBaseDomainFromLink(_obj.entities[i].entity); //rejects cookies; may want to add them back later
 			
+			var cookie = '';
+			if (_obj.entities[i].type=='cookies') {
+				cookie = _obj.entities[i].entity;
+			}
+			
 			var domain = _obj.entities[i].domain;
 			oldest_timestamp = oldest_timestamp<_obj.entities[i].timestamp?oldest_timestamp:_obj.entities[i].timestamp;
 			
@@ -105,9 +142,10 @@
 			if (_data.sites[domain]==null){
 				_data.sites[domain] = {};
 				_data.sites[domain].entities = [];
+				_data.sites[domain].cookies = [];
 			}	
 			
-			if ( !checkBlacklist(domain,entity) ) {
+			if ( !checkBlacklist(domain,entity) || cookie.length>0 ) {
 			
 				//only index sites with entities
 				if (_data.sites[domain].index==null) {
@@ -128,12 +166,29 @@
 				if (_data.entities[entity].sites.indexOf(domain)==-1){
 					_data.entities[entity].sites.push(domain);
 				}
-			
+				
+				if (cookie.length>0) {
+					if (_data.cookies[cookie]==null){
+						_data.cookies[cookie] = {};
+						_data.cookies[cookie].index = cookies_index;
+						_data.cookies[cookie].sites = [];
+						cookies_index++;
+					}
+					
+					if (_data.sites[domain].cookies.indexOf(cookie)==-1){
+						_data.sites[domain].cookies.push(cookie);
+					}
+					if (_data.cookies[cookie].sites.indexOf(domain)==-1){
+						_data.cookies[cookie].sites.push(domain);
+						if (_data.cookies[cookie].sites.length>1){
+							console.log(cookie,_data.cookies[cookie].sites);
+						}
+					}
+				}
 				
 			}
 		}
-		console.log(_data);
-		//console.log(oldest_timestamp);
+		//console.log(_data);
 		_data["oldest_timestamp"] = oldest_timestamp;
 		return _data;
 	}
@@ -168,9 +223,7 @@
 	getting, setting, and updating local data storage.
 	*/
 	
-	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-    	//console.log(sender.tab ? "from a content script:" + sender.tab.url :"from the extension");  
-    	
+	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {    	
     	switch(request.method) {
     		case 'get':
 				//Nothing happens in here; all methods get the final object and pass it back to the browser
@@ -186,11 +239,11 @@
     	}
     	
     	var _obj = getLocalDataObj(request.dataLabel);
-    	console.log("orig obj",_obj);
+    	//console.log("orig obj",_obj);
     	
+    	//In practice, this is every request from popup.html and landingpage.html
     	if (typeof(request.sort_type)!=undefined && request.sort_type=='by_domain' ){
-    		console.log("sorting");
-    		_obj = sortLocalDataObj(_obj, request.sort_type);
+    		_obj = sortLocalDataObj(_obj);
     	}
     	
     	var size = $.jStorage.storageSize();

@@ -47,4 +47,5 @@ $(document).ready(function(){
 	$("#settings").mouseleave(function(){
 		$("#settings").slideToggle(200);
 	});
+	
 });

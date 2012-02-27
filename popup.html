@@ -27,15 +27,19 @@
 			<div id="title">The Vibrant Web</div>
 			
 		</div>
-		<div id="leaderboard">
-		
-		
+		<!--
+		<div id="leaderboardControls" class='clearfix'>
+			<div id="entities" class='selected leaderboard'>Scripts & Images</div>
+			<div id="cookies" class='leaderboard'>Cookies</div>
 		</div>
+		-->
+		<div id="leaderboard"></div>
 		<div id="footer">
-			<span>Sites visited since </span>
 			<span id="since_date"></span>
-			<span>: </span>
+			<span>Sites:</span>
 			<span id="count_sites"></span>
+			<span>3rd-party entities:</span>
+			<span id="count_entities"></span>
 		</div>
 	
 	
@@ -85,6 +89,8 @@
 		$("#clearHistory").click(function() {
 			chrome.extension.sendRequest({method:"delete",dataLabel:"browsingData"}, function(response) {
 				$("#myTable > tbody").remove();
+				$("#count_sites").text("0");
+				$("#count_entities").text("0");
 			});	
 		})
 		
@@ -94,24 +100,32 @@
 		})
 
 		
-		function viewDataAsTable(_data,tabDomain) {
-			var total_sites = Object.keys(_data.sites).length;
-			$("#count_sites").text(total_sites);			
-			$("#since_date").text(_data.oldest_timestamp.split("T")[0]+" "+_data.oldest_timestamp.split("T")[1].split(".")[0]);
+		function viewDataAsTable(_data,type,tabDomain) {
 			
+		
+			var total_sites = Object.keys(_data.sites).length;
+			$("#count_sites").text(total_sites);
+			var date_arr = _data.oldest_timestamp.split("T")[0].split("-");
+			var date_str = date_arr[1]+"/"+date_arr[2]+"/"+date_arr[0]+" "+_data.oldest_timestamp.split("T")[1].split(".")[0];
+						
+			$("#since_date").text("Since "+date_str);
+			$("#count_entities").text(Object.keys(_data[type]).length);
 			
 			var str="<table id='myTable' class='tablesorter'><thead><tr>";	
 			str+="<th class='this_th'></th><th class='domain_head'>Domain</th><th class='count_head'>Count</th><th class='count_head'>Sites</th>";
 			str+="</tr></thead><tbody>";
 		
-			$.each(_data.entities,function(k,v){
-					console.log("tab",tabDomain,v.sites);
+		
+			$.each(_data[type],function(k,v){
+					//console.log("tab",tabDomain,v.sites);
+					
 					var highlight_td = "color_off";
 					var highlight_on = 1;
 					if (v.sites.indexOf(tabDomain)!=-1){
 						highlight_td = "color_on";
 						highlight_on = 0;
 					}
+					
 					str+="<tr><td width='15' class='"+highlight_td+"'>"+highlight_on+"</td>"
 					+"<td class='domain_td'><a target='_blank' href='http://www.whois.net/whois/"+parseBaseDomain(k)+"'>"+k+"</a></td>"
 					+"<td align='center' width='48' class='count_td'>"+v.sites.length+"</td>"
@@ -122,26 +136,29 @@
 			return str;
 		}
 		
-		console.log("starting send request");
 		
-		chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
-			var _data = response.data;
-			var len = Object.keys(_data).length;
-			if (!(len>0)) {
-				$('#leaderboard').append("<div id='noResults'>You currently have no Vibrant history.</div>");
-			} else {
-				chrome.tabs.getSelected(null,function(tab) {
-					console.log("tab url",tab.url);
-					var tabDomain = parseBaseDomainFromLink(tab.url,true);
-					var table = viewDataAsTable(_data,tabDomain);
+		chrome.tabs.getSelected(null,function(tab) {
+			console.log("tab url",tab.url);
+			var tabDomain = parseBaseDomainFromLink(tab.url,true);
+			
+			chrome.cookies.onChanged.addListener(function(info) {
+				console.log(tabDomain,info.cookie);
+			
+			});
+			
+			chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
+				var _data = response.data;
+				var len = Object.keys(_data).length;
+				if (!(len>0)) {
+					$('#leaderboard').append("<div id='noResults'>You currently have no Vibrant history.</div>");
+				} else {
+					var table = viewDataAsTable(_data,'entities',tabDomain);
 					$('#leaderboard').append(table);
 			    	$("#myTable").tablesorter({sortList: [[2,1]] });
-
-				});
-			}
-		
+				}
+			
+			});
 		});
-
 	
 	</script>
 </body>

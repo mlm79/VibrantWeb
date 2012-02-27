@@ -80,6 +80,7 @@ Vibrant.collectSiteEntities = function() {
 	//Collect scripts, imgs, links
 	$.each(el_types,function(i){
 		$(el_types[i]["el_match"],document).each(function(){
+			//console.log(domain,cleanLink);
 			var cleanLink = Vibrant.cleanLink($(this),el_types[i]["attr_match"]);		
 			if (cleanLink){
 				siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cleanLink,"type":el_types[i]["name"]});
@@ -87,13 +88,21 @@ Vibrant.collectSiteEntities = function() {
 		});
 	});
 	
-	//Collect cookies
-	var cookies = document.cookie.split(";");
-	$.each(cookies, function(i){
-		siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cookies[i],"type":"cookies"});
-	});
+	//Removing cookie collection from vibrant.js and adding it to background.html
 	
+	//Collect cookies
+	/*
+	var cookies = document.cookie.split(";");
+	console.log(document.cookie.domain);
+	$.each(cookies, function(i){
+		var cookie = JSON.stringify(cookies[i]);
+		console.log(cookie);
+		siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cookie,"type":"cookies"});
+	});
+	*/
+
 	return siteEntities;
+
 }
 
 /* 
