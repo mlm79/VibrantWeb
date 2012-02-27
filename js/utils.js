@@ -7,9 +7,9 @@ function parseBaseDomain(domainStr) {
 
 //return full domain
 function parseBaseDomainFromLink(_http_link,base_domain) {
-	var re = /^http:\/\/(.*?)\//; //match domain
+	var re = /^(http|https):\/\/(.*?)\//; //match domain
 	 _http_link.match(re)
-	var domain =RegExp.$1;
+	var domain =RegExp.$2;
 	if (base_domain){
 		domain = parseBaseDomain(domain);
 	}

@@ -123,6 +123,8 @@
 	*/
 	
 	function sortLocalDataObj(_obj) {	
+		console.log("orig obj",_obj);
+		
 		var _data = {sites:{},entities:{},cookies:{}},
 			sites_index = 0,
 			entities_index = 0,
@@ -135,10 +137,12 @@
 			}
 			var entity = parseBaseDomainFromLink(_obj.entities[i].entity); //rejects cookies; may want to add them back later
 			
+			/*
 			var cookie = '';
 			if (_obj.entities[i].type=='cookies') {
 				cookie = _obj.entities[i].entity;
 			}
+			*/
 			
 			var domain = _obj.entities[i].domain;
 			oldest_timestamp = oldest_timestamp<_obj.entities[i].timestamp?oldest_timestamp:_obj.entities[i].timestamp;
@@ -147,10 +151,12 @@
 			if (_data.sites[domain]==null){
 				_data.sites[domain] = {};
 				_data.sites[domain].entities = [];
-				_data.sites[domain].cookies = [];
+				//_data.sites[domain].cookies = [];
 			}	
 			
-			if ( !checkBlacklist(domain,entity) || cookie.length>0 ) {
+			if ( !checkBlacklist(domain,entity) ) {
+							
+			
 			
 				//only index sites with entities
 				if (_data.sites[domain].index==null) {
@@ -160,6 +166,7 @@
 				
 				if (_data.entities[entity]==null){
 					_data.entities[entity] = {};
+
 					_data.entities[entity].index = entities_index;
 					_data.entities[entity].sites = [];
 					entities_index++;
@@ -172,6 +179,7 @@
 					_data.entities[entity].sites.push(domain);
 				}
 				
+				/*
 				if (cookie.length>0) {
 					if (_data.cookies[cookie]==null){
 						_data.cookies[cookie] = {};
@@ -190,10 +198,10 @@
 						}
 					}
 				}
-				
+				*/
 			}
 		}
-		//console.log(_data);
+		console.log("sorted data",_data);
 		_data["oldest_timestamp"] = oldest_timestamp;
 		return _data;
 	}

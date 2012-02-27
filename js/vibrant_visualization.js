@@ -194,12 +194,24 @@ VibrantViz.interRelations = function(canvas_id,_data){
 	//Filter out objects if that don't fall in the various min/max ranges,
 	//or if they don't match the site_search value
 	//@params - type: usually 'sites'; other: either 'entities' or 'cookies'
+	
 	function filterDataObjects(type,other,min,max,min2,max2) {
 		var d = _d = data_objects();
 		//var new_data = {'sites':[],'entities':[],'cookies':[]};
 		var new_data = {'sites':[],'entities':[]};
 		for (var i=0; i < _d[type].length;i++){
-			if (_d[type][i].children.length>=min & _d[type][i].children.length<=max) {
+			
+			var skip = false;
+			/*
+			for (var j=0;j<_d[type][i].children.length;j++){
+				if ( _d[type][i].children[j].length>=min2 & _d[type][i].children[j].length<=max2 ) {
+					skip = false;
+				} else {
+					skip = true;
+				}
+			}
+			*/
+			if (_d[type][i].children.length>=min & _d[type][i].children.length<=max & skip==false) {
 				var obj = DataObject.builder(type,_d[type][i].id);
 				new_data[type].push(obj);
 				
