@@ -8,6 +8,7 @@ After installation, click the pink VW icon in your browser bar, and in the resul
 
 + At any time, you can click the VW icon to see a running list of 3rd-party entities that are on sites you have visited. 
 + Sorting on the far left column shows the entities that are the site you're currently visited (identified by the pink square).
++ Click on an entity to go to its Whois page where you can learn about the domain's owner.
 + Moving your mouse to the top of the pop-up reveals the control panel; from there you can click on "The Vibrant Web" to see a visualization of your full browing history; you can
 also turn off entity collection and clear your history.
 
