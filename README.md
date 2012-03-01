@@ -6,6 +6,11 @@ A Chrome plug-in for mining and visualizing 3rd-party entities on the web.
 From the downloads page, download the crx file, and open it in Chrome.
 After installation, click the pink VW icon in your browser bar, and in the resulting popup, click the "ON" button.
 
++At any time, you can click the VW icon to see a running list of 3rd-party entities that are on sites you have visited. 
++Sorting on the far left column shows the entities that are the site you're currently visited (identified by the pink square).
++Moving your mouse to the top of the pop-up reveals the control panel; from there you can click on "The Vibrant Web" to see a visualization of your full browing history; you can
+also turn off entity collection and clear your history.
+
 ### What it collects
 3rd-party links, scripts, image beacons, and frames. There is logic to separate benign text links from links that may trigger tracking behavior, and a filtering mechanism
 to take out scripts that are not used for tracking (e.g. jQuery), either on a per-site basis or globally. (Entities to be filtered out from results are 
