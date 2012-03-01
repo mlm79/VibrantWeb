@@ -6,30 +6,6 @@
      <script type="text/javascript" src='js/site_blacklist.js'></script>
   </head>
 <script type="text/javascript">
-	/*
-	
-	//Live recording of cookie read/writes. Not fully implemented, because there is currently no way to
-	//reliably discern which site is instigating the particular read/write.
-	
-	chrome.cookies.onChanged.addListener(function(info) {
-		chrome.tabs.getSelected(null,function(tab) {
-			
-			var tabDomain = parseBaseDomainFromLink(tab.url,true);	
-			if (info.removed==false && tabDomain!=parseBaseDomain(info.cookie.domain)) {
-				console.log(tabDomain,info.cookie.domain,info.cookie);
-			}
-			
-			var cookieDomain = parseBaseDomain(info.cookie.domain);
-			if (tabDomain!="undefined."&&info.removed==false&&tabDomain!=cookieDomain) {
-				var timestamp = new Date();
-				var cookie = [{"timestamp":timestamp,"domain":tabDomain,"site":tab.url,"entity":cookieDomain,"type":"cookies"}];
-				setLocalDataObj("browsingData",cookie);
-			}
-		});
-	});
-	
-	*/
-	
 	
 	/* 
 	getDataShell function
@@ -137,13 +113,6 @@
 			}
 			var entity = parseBaseDomainFromLink(_obj.entities[i].entity); //rejects cookies; may want to add them back later
 			
-			/*
-			var cookie = '';
-			if (_obj.entities[i].type=='cookies') {
-				cookie = _obj.entities[i].entity;
-			}
-			*/
-			
 			var domain = _obj.entities[i].domain;
 			oldest_timestamp = oldest_timestamp<_obj.entities[i].timestamp?oldest_timestamp:_obj.entities[i].timestamp;
 			
@@ -151,13 +120,10 @@
 			if (_data.sites[domain]==null){
 				_data.sites[domain] = {};
 				_data.sites[domain].entities = [];
-				//_data.sites[domain].cookies = [];
 			}	
 			
 			if ( !checkBlacklist(domain,entity) ) {
-							
-			
-			
+
 				//only index sites with entities
 				if (_data.sites[domain].index==null) {
 					_data.sites[domain].index = sites_index;
@@ -178,30 +144,8 @@
 				if (_data.entities[entity].sites.indexOf(domain)==-1){
 					_data.entities[entity].sites.push(domain);
 				}
-				
-				/*
-				if (cookie.length>0) {
-					if (_data.cookies[cookie]==null){
-						_data.cookies[cookie] = {};
-						_data.cookies[cookie].index = cookies_index;
-						_data.cookies[cookie].sites = [];
-						cookies_index++;
-					}
-					
-					if (_data.sites[domain].cookies.indexOf(cookie)==-1){
-						_data.sites[domain].cookies.push(cookie);
-					}
-					if (_data.cookies[cookie].sites.indexOf(domain)==-1){
-						_data.cookies[cookie].sites.push(domain);
-						if (_data.cookies[cookie].sites.length>1){
-							console.log(cookie,_data.cookies[cookie].sites);
-						}
-					}
-				}
-				*/
 			}
 		}
-		console.log("sorted data",_data);
 		_data["oldest_timestamp"] = oldest_timestamp;
 		return _data;
 	}

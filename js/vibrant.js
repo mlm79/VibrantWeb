@@ -2,7 +2,7 @@
  * vibrant.js -- A tool for mining and visualizing 3rd-party entities on the web.
  * This script requires jQuery.
  *
- * @author Margaret McKenna
+ * @author Margaret McKenna - mlmckenna.com
 */
 
 /* 
@@ -49,7 +49,6 @@ Vibrant.checkSessionState = function() {
 Vibrant.load = function(){
 	var siteEntities = Vibrant.collectSiteEntities();
 	Vibrant.sessionObj = siteEntities;
-	//var title = "Artifacts from "+document.URL;
 	Vibrant.storeSiteEntities(siteEntities);
 }
 
@@ -80,7 +79,6 @@ Vibrant.collectSiteEntities = function() {
 	//Collect scripts, imgs, links
 	$.each(el_types,function(i){
 		$(el_types[i]["el_match"],document).each(function(){
-			//console.log(domain,cleanLink);
 			var cleanLink = Vibrant.cleanLink($(this),el_types[i]["attr_match"]);		
 			if (cleanLink){
 				siteEntities.push({"timestamp":timestamp,"domain":domain,"site":site,"entity":cleanLink,"type":el_types[i]["name"]});

@@ -16,15 +16,19 @@ function parseBaseDomainFromLink(_http_link,base_domain) {
 	return domain;
 }
 
+//ignore files from cdns; 
+//also ignore source if it ends with an image extension (as opposed to parameters)
 function badMatches() {
 	var re = /(cdn\.|\/$|\.png$|\.gif$|\.jpg$)/; //match cdn, links to website
 	return re;
 }
 
+//for displaying the size of the json storage in background.html
 function toMBytes(bytes) {
 	return bytes/1024/1024+"M";
 }
 
+//don't collect anything from the extension
 function isGoodUrl() {
 	var re = /(^chrome-extension:\/\/)/;
 	return document.URL.match(re)==null;

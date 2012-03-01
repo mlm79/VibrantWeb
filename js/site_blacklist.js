@@ -1,4 +1,10 @@
-var site_blacklist = {
+//A JSON object used to identify benign 3rd-party entities,
+//on a per-site and global (*) basis.
+
+//Currently the properties are exact matches; could be implemented
+//as regex in the future.
+
+var entity_blacklist = {
 	'fastcodesign.com' : [
 		"www.fastcompany.com"
 	],

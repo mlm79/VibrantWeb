@@ -41,28 +41,6 @@
 						<div id="entity-range"></div>
 					</div>
 				</div>
-				<!--<a onclick="$( '#cnv' ).hide( 'clip',{direction:'horizontal'}, 1000,function(){ $( '#cnv' ).show( 'clip',{direction:'horizontal'}, 1000)});">Click Me</a>-->
-				<!--
-				<div class="demo">
-					<div class="form">
-						<form>
-							<div id="radio">
-								<input type="radio" id="entities" name="entities" checked="checked" /><label for="entities">Scripts, Links & Images</label>
-								<input type="radio" id="cookies" name="cookies" /><label for="cookies">Cookies</label>
-								<input type="radio" id="about" name="about" /><label for="about">About</label>
-							</div>
-						</form>
-					</div>
-				</div>
-				<script>
-					$(function() {
-						$( "#radio" ).buttonset();
-						$("#cookies").click(function(){
-							  $(this).button( "refresh" )
-						})
-					});
-				</script>
-				-->
 				<canvas id="cnv"> 
 		    		Your browser is not supported.
 				</canvas>
@@ -70,22 +48,21 @@
 			</div>
 		</div>
 		
-		<script type="text/javascript">
-			
-		
+		<script type="text/javascript">		
 			$(document).ready(function(){
+			
+				//fit visualization to browser size
 				function resize() {
 					var w = $(window).width() - 60;
 					var h = $(window).height() - $("#header").outerHeight() - $("#controls").outerHeight() - 100;
-					console.log(new Date(),w,h);
 					$('#cnv').attr('width',w);
 					$('#cnv').attr('height',h);
 					$('#controls').css({'width':w+'px'});
 				}
-			
-				resize();
-
+				
+				//get data from background.html and call visualization
 				chrome.extension.sendRequest({method:"get",dataLabel:"browsingData",sort_type:"by_domain"}, function(response) {
+					resize();
 					VibrantViz.interRelations($("#cnv").attr('id'),response.data);
 				});
 			});

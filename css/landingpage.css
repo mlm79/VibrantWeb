@@ -66,6 +66,13 @@ body {
 	float:right;
 }
 
+#cnv {
+	border:1px solid #454545;
+	background:white;
+	margin-top:30px;
+	margin-left:30px;
+}
+
 
 /* 
  * jQuery-UI elements 
@@ -104,52 +111,4 @@ body {
 }
 
 
-/**/
 
-
-#cnv {
-	border:1px solid #454545;
-	background:white;
-	margin-top:30px;
-	margin-left:30px;
-}
-/*
-#legend {
-	width:200px;
-	list-style: none;
-	margin:0;
-	padding:0;
-	z-index:1000;
-	position:absolute;
-	top:50px;
-	left:20px;
-	color: white;
-}
-
-#legend  li {
-	list-style: none;
-}
-
-#myTable {
-	table-layout:fixed;
-	width:80%;
-	margin:auto;
-	margin-top:30px;
-}
-
-
-td {
-	max-width:500px;
-	word-wrap: break-word;
-}
-
-.link {
-	cursor: pointer;
-	float: right;
-	margin-right:15px;
-}
-
-.link a:hover {
-	color:#23b8fe;
-}
-*/
